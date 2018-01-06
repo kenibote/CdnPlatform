@@ -16,3 +16,20 @@ issue-1:
 
 CODE信息：
 ERROR_001 : KEY错误，鉴权错误
+ERROR_002 : 未知任务类型
+
+
+TASK信息：
+TASK_001 : 通用hello包
+TASK_002 : 设置ID，优先IP，等参数……包
+
+
+monitor --> user的通信格式：
+KEY:USER
+TYPE:TASK_001
+
+user --> monitor的通信格式：
+CODE:TASK000/ERROR000
+(STATE：SUCCESS/FAIL ) 如果code是error的话，state信息是没有的
+DEVICE:USER
+ID:NULL/1/2/...
