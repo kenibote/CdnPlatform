@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,9 +28,18 @@ public class UserBackTCP implements Runnable {
 		this.server_port = port;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
 		ServerSocket serverSocket = null;
+		// 将这些声明拿到上面，防止大量重出创建产生内存压力
+		Socket socket = null;
+		BufferedReader input = null;
+		PrintWriter write = null;
+		String getCommand = null;
+		String key = null;
+		HashMap<String, String> result = new HashMap<>();
+		JSONObject json = null;
 
 		try {
 			serverSocket = new ServerSocket(server_port);
@@ -38,32 +48,38 @@ public class UserBackTCP implements Runnable {
 				logger.info("Start Listerning ... Port:" + server_port);
 
 				// 当有连接接入的时候,接收连接
-				Socket socket = serverSocket.accept();
+				socket = serverSocket.accept();
 				logger.info("Connect in...Remote:" + socket.getRemoteSocketAddress());
 
 				// 获取socket写入与写出句柄
-				BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				PrintWriter write = new PrintWriter(socket.getOutputStream());
+				input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				write = new PrintWriter(socket.getOutputStream());
 				// 将该信息写入到公共空间中
 				UserPublicSetting.MonitorSocketInput = input;
 				UserPublicSetting.MonitorSocketWrite = write;
 
-				String getCommand = null;
+				getCommand = null;
 				// 连接建立方可以主动关闭界面
 				while (!socket.isClosed() && (getCommand = input.readLine()) != null) {
 					// 此时已经获得了输入信息,记录信息
 					logger.info(getCommand);
 
-					// 或许鉴权信息
-					String key = JSONObject.fromObject(getCommand).getString("KEY");
+					// 或许鉴权信息,增加安全措施
+					key = (String) JSONObject.fromObject(getCommand).getOrDefault("KEY", "NULL");
 					if (UserPublicSetting.Key.equals(key)) {
 						// 正确，则进入命令执行函数
 						UserControl.Router(getCommand);
 					} else {
 						// 否则鉴权错误，主动关闭socket
-						write.println("{\"CODE\":\"ERROR_001\"}");
-						write.flush();
+						result.clear();
+						result.put("CODE", "ERROR_001");
+						result.put("DEVICE", "USER");
+						result.put("ID", UserPublicSetting.ID);
+						json = JSONObject.fromObject(result);
+
 						logger.info("Key Wrong！！！");
+						write.println(json.toString());
+						write.flush();
 						socket.close();
 					}
 
