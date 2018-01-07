@@ -44,17 +44,17 @@ public class UserControl {
 	}
 
 	/**
-	 * 基础设置函数
+	 * 基础设置函数; 目前设置的内容有：userID，LocalServer ip & port
 	 */
 	@SuppressWarnings("unchecked")
 	public static void UsuallySet(String commandin) {
 		json = JSONObject.fromObject(commandin);
 		// user端的ID
-		UserPublicSetting.ID = (String) json.getOrDefault("ID","NULL");
+		UserPublicSetting.ID = (String) json.getOrDefault("ID", "NULL");
 		// user优先联系的本地服务器信息
 		UserPublicSetting.LocalServerIP = (String) json.getOrDefault("LocalServerIP", "NULL");
 		UserPublicSetting.LocalServerPort = Integer.parseInt((String) json.getOrDefault("LocalServerPort", "0"));
-		
+
 		initResult("INIT");
 		result.put("CODE", "TASK_002");
 		result.put("STATE", "SUCCESS");
@@ -71,7 +71,7 @@ public class UserControl {
 		result.put("CODE", "TASK_001");
 		result.put("STATE", "SUCCESS");
 		result.put("LocalServerIP", UserPublicSetting.LocalServerIP);
-		result.put("LocalServerPort", ""+UserPublicSetting.LocalServerPort);
+		result.put("LocalServerPort", "" + UserPublicSetting.LocalServerPort);
 		initResult("SEND");
 	}
 
