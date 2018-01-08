@@ -19,42 +19,50 @@ public class FileDownload implements Runnable {
 	private String sendMessage = "Group1.jpg";
 	private String savePath = "E:\\";
 	// 默认，用于向上层返回状态
-	private boolean flag = true;
 	private int ID = 0;
 	private long start_time = 0;
 	private long end_time = 0;
 
+	/**
+	 * run()函数的一个运行思路：
+	 * 先向localserver确认下载地址，此处可能会修改IP:PORT这2个参数，需要在task执行记录里面登记，此处也要记录时间；
+	 * 之后调用download函数执行下载，记录时间； TODO 需要补充该内容
+	 */
 	@Override
 	public void run() {
+
+		// 记录起始时间
+		start_time = System.currentTimeMillis();
+		// 开始下载
+		boolean result = download();
+		// 记录结束时间
+		end_time = System.currentTimeMillis();
+		// 记录下载时间与下载结果
+		logger.info(ID + ":" + (end_time - start_time));
+		logger.info(result);
+	}
+
+	// 通用下载函数
+	public boolean download() {
 		try {
-			// 记录起始时间
-			start_time = System.currentTimeMillis();
-			// 开始下载
 			if (createConnection()) {
 				sendMessage();
 				getMessage();
 			}
-			// 记录结束时间
-			end_time = System.currentTimeMillis();
+			// 如果下载成功
+			return true;
 
-			// 如果需要记录数据
-			if (flag) {
-				logger.info(ID+":"+(end_time-start_time));
-			}
 		} catch (Exception ex) {
-			// TODO 如果下载失败，增加处理程序
-			if (flag) {
-
-			}
+			// 如果下载失败
+			return false;
 		}
 	}
 
 	// 初始化下载信息
-	public FileDownload(String localserver, int server_port, String targetfile, boolean fan, int taskid) {
+	public FileDownload(String localserver, int server_port, String targetfile, int taskid) {
 		this.ip = localserver;
 		this.port = server_port;
 		this.sendMessage = targetfile;
-		this.flag = fan;
 		this.ID = taskid;
 	}
 
@@ -99,18 +107,18 @@ public class FileDownload implements Runnable {
 			DataOutputStream fileOut = new DataOutputStream(
 					new BufferedOutputStream(new BufferedOutputStream(new FileOutputStream(savePath))));
 			// 记录文件长度
-			inputStream.readLong(); 
+			inputStream.readLong();
 
 			while (true) {
 				int read = 0;
 				if (inputStream != null) {
 					read = inputStream.read(buf);
 				}
-				
+
 				if (read == -1) {
 					break;
 				}
-				
+
 				fileOut.write(buf, 0, read);
 			}
 			fileOut.close();
