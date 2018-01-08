@@ -21,7 +21,8 @@ ERROR_002 : 未知任务类型
 
 TASK信息：
 TASK_001 : 通用hello包
-TASK_002 : 设置ID，优先IP，等参数……包
+TASK_002 : 设置ID，优先IP，等参数……包(MONITOR-->USER)
+TASK_003 : 设置ID,原服务器IP:PORT, 服务能力(端口号范围)，邻居地址等... (MONITOR-->LOCALSERVER)
 
 
 monitor --> user的通信格式：
