@@ -50,6 +50,22 @@ public class FileServerControl implements Runnable {
 		ThreadPool.get(port).fss = status;
 	}
 
+	// 查找空闲的服务器
+	public synchronized static int findAvailbaleServer() {
+		int port = start_port;
+		while (port <= end_port) {
+			if (ThreadPool.get(port).fss == FileServerStatus.AVAILABLE) {
+				// 如果找到可用的，先设置该端口已占用，之后直接返回该端口号
+				ThreadPool.get(port).fss = FileServerStatus.BUSY;
+				return port;
+			}
+
+			port++;
+		}
+		// 否则返回-1
+		return -1;
+	}
+
 	// 初始化文件服务
 	public static void initFileServer() {
 		int port = start_port;

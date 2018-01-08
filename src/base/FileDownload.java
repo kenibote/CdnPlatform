@@ -1,12 +1,18 @@
 package base;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import net.sf.json.JSONObject;
 
 public class FileDownload implements Runnable {
 	private static Logger logger = LogManager.getLogger(FileDownload.class.getName());
@@ -28,8 +34,33 @@ public class FileDownload implements Runnable {
 	 * 先向localserver确认下载地址，此处可能会修改IP:PORT这2个参数，需要在task执行记录里面登记，此处也要记录时间；
 	 * 之后调用download函数执行下载，记录时间； TODO 需要补充该内容
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
+		// TODO 此处还有大量代码需要完善
+		
+		try {
+			// 与本地服务器建立连接
+			Socket socket = new Socket(ip, port);
+			BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			PrintWriter write = new PrintWriter(socket.getOutputStream());
+
+			// 发送任务请求
+			write.println("{\"ID\":\"" + sendMessage + "\"}");
+			write.flush();
+
+			// 接收重定向信息，并修改本地信息
+			String command = input.readLine();
+			ip = (String) JSONObject.fromObject(command).getOrDefault("IP", "NULL");
+			port = Integer.parseInt((String) JSONObject.fromObject(command).getOrDefault("PORT", "NULL"));
+
+			// 关闭连接
+			socket.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// ---------------------------------------------------------------------------------------
 
 		// 记录起始时间
 		start_time = System.currentTimeMillis();
@@ -38,8 +69,7 @@ public class FileDownload implements Runnable {
 		// 记录结束时间
 		end_time = System.currentTimeMillis();
 		// 记录下载时间与下载结果
-		logger.info(ID + ":" + (end_time - start_time));
-		logger.info(result);
+		logger.info(ID + ":" + (end_time - start_time) + ":" + result);
 	}
 
 	// 通用下载函数
