@@ -57,7 +57,7 @@ public class LocalServerControl {
 		LocalServerPublicSetting.End_port = Integer.parseInt((String) json.getOrDefault("EndPort", "0"));
 
 		// 记录邻居信息
-		int neighbor_number = Integer.parseInt((String) json.getOrDefault("EndPort", "0"));
+		int neighbor_number = Integer.parseInt((String) json.getOrDefault("LocalServerNumber", "0"));
 		LocalServerPublicSetting.Neighbor.clear();
 		for (int i = 1; i <= neighbor_number; i++) {
 			// 注意这里json传递的信息和实际记录在LocalServerPublicSetting中的信息并不一样
@@ -65,7 +65,12 @@ public class LocalServerControl {
 			String NeighborIP = (String) json.getOrDefault(KEY, "NULL");
 			LocalServerPublicSetting.Neighbor.put("LocalServer" + i, NeighborIP);
 		}
-
+		
+		logger.info("Setting Updated!");
+		initResult("INIT");
+		result.put("CODE", "TASK_003");
+		result.put("STATE", "SUCCESS");
+		initResult("SEND");
 	}
 
 	/**
