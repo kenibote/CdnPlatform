@@ -1,10 +1,12 @@
 package localserver;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import base.FileServerControl;
 import net.sf.json.JSONObject;
 
 public class LocalServerControl {
@@ -27,9 +29,24 @@ public class LocalServerControl {
 		gowhere = (String) JSONObject.fromObject(commandin).getOrDefault("TYPE", "NULL");
 		// 命令路由表
 		switch (gowhere) {
+		case "TASK_001":
+			HELLO();
+			break;
 
 		case "TASK_003":
 			localserverSet(commandin);
+			break;
+
+		case "TASK_004":
+			initLocalServer();
+			break;
+
+		case "TASK_005":
+			StartLocalServer();
+			break;
+
+		case "TASK_006":
+			StopLocalServer();
 			break;
 
 		// 如果没有匹配到任何task
@@ -37,6 +54,91 @@ public class LocalServerControl {
 			Default();
 		}
 
+	}
+
+	public static void initLocalServer() {
+
+		// 设置并启动load-balance服务
+		// load-balance 服务会使用到LocalServerPublicSetting中设置的端口号
+		LocalServerPublicSetting.loadbalanceserver = new LoadBalanceServer();
+		LocalServerPublicSetting.t_load = new Thread(LocalServerPublicSetting.loadbalanceserver);
+		LocalServerPublicSetting.t_load.start();
+
+		// 设置并启动FileServerControl服务
+		// 这个类启动之后并没有什么副作用
+		LocalServerPublicSetting.fileservercontrol = new FileServerControl();
+		LocalServerPublicSetting.t_file = new Thread(LocalServerPublicSetting.fileservercontrol);
+		LocalServerPublicSetting.t_file.start();
+
+		initResult("INIT");
+		result.put("CODE", "TASK_004");
+		result.put("STATE", "SUCCESS");
+		initResult("SEND");
+	}
+
+	/**
+	 * 启动本地服务器
+	 */
+	public static void StartLocalServer() {
+		initResult("INIT");
+
+		if (!LocalServerPublicSetting.localserverflag) {
+			// 启动文件下载服务
+			FileServerControl.setPort(LocalServerPublicSetting.Start_port, LocalServerPublicSetting.End_port);
+			FileServerControl.initFileServer();
+			FileServerControl.startFileServer();
+
+			result.put("CODE", "TASK_005");
+			result.put("STATE", "SUCCESS");
+
+			LocalServerPublicSetting.localserverflag = true;
+		} else {
+			result.put("CODE", "ERROR_3");
+		}
+
+		initResult("SEND");
+	}
+
+	public static void StopLocalServer() {
+		initResult("INIT");
+		if (LocalServerPublicSetting.localserverflag) {
+			// 关闭FileServerControl服务
+			FileServerControl.stopFileServer();
+
+			result.put("CODE", "TASK_006");
+			result.put("STATE", "SUCCESS");
+
+			LocalServerPublicSetting.localserverflag = false;
+		} else {
+			result.put("CODE", "ERROR_4");
+		}
+
+		initResult("SEND");
+	}
+
+	// HELLO包
+	public static void HELLO() {
+		logger.info("HELLO package");
+
+		initResult("INIT");
+		result.put("CODE", "TASK_001");
+		result.put("STATE", "SUCCESS");
+
+		result.put("OriginalServerIP", LocalServerPublicSetting.OriginalServerIP);
+		result.put("LoadBalancePort", "" + LocalServerPublicSetting.LoadBalancePort);
+
+		result.put("StartPort", "" + LocalServerPublicSetting.Start_port);
+		result.put("EndPort", "" + LocalServerPublicSetting.End_port);
+
+		result.put("LocalServerNumber", "" + LocalServerPublicSetting.Neighbor.size());
+		Iterator<String> it = LocalServerPublicSetting.Neighbor.keySet().iterator();
+		while (it.hasNext()) {
+			String key = it.next();
+			result.put(key, LocalServerPublicSetting.Neighbor.get(key));
+		}
+		result.put("LocalServerStatus", LocalServerPublicSetting.localserverflag + "");
+
+		initResult("SEND");
 	}
 
 	/**
@@ -50,8 +152,7 @@ public class LocalServerControl {
 		LocalServerPublicSetting.ID = (String) json.getOrDefault("ID", "NULL");
 		// 原服务器信息
 		LocalServerPublicSetting.OriginalServerIP = (String) json.getOrDefault("OriginalServerIP", "NULL");
-		LocalServerPublicSetting.OriginalServerPort = Integer
-				.parseInt((String) json.getOrDefault("OriginalServerPort", "0"));
+		LocalServerPublicSetting.LoadBalancePort = Integer.parseInt((String) json.getOrDefault("LoadBalancePort", "0"));
 		// 本地服务能力（起始与终止端口）
 		LocalServerPublicSetting.Start_port = Integer.parseInt((String) json.getOrDefault("StartPort", "0"));
 		LocalServerPublicSetting.End_port = Integer.parseInt((String) json.getOrDefault("EndPort", "0"));
@@ -65,7 +166,7 @@ public class LocalServerControl {
 			String NeighborIP = (String) json.getOrDefault(KEY, "NULL");
 			LocalServerPublicSetting.Neighbor.put("LocalServer" + i, NeighborIP);
 		}
-		
+
 		logger.info("Setting Updated!");
 		initResult("INIT");
 		result.put("CODE", "TASK_003");

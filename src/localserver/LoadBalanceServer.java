@@ -22,22 +22,20 @@ public class LoadBalanceServer implements Runnable {
 	private static Logger logger = LogManager.getLogger(LoadBalanceServer.class.getName());
 
 	// 服务器监听端口，默认8070
-	private int server_port = 8070;
+	private int server_port = LocalServerPublicSetting.LoadBalancePort;
 	private static HashMap<String, String> result = new HashMap<>();
 
 	// 由该函数查找指定服务器
 	private static void findServer(String ID) {
 		/**
-		 * TODO 此处有大量逻辑代码需要完善；
-		 * 先查找本地知否有该内容，如果有则检查服务是否可用；
-		 * 如果没有，则请求别的服务器；
-		 * */
+		 * TODO 此处有大量逻辑代码需要完善； 先查找本地知否有该内容，如果有则检查服务是否可用； 如果没有，则请求别的服务器；
+		 */
 		// 如果服务不可用，port为-1；
 		int port = FileServerControl.findAvailbaleServer();
 
 		result.clear();
 		result.put("RESULT", "SUCCESS");
-		result.put("IP", "10.10.12.98");
+		result.put("IP", LocalServerPublicSetting.Neighbor.get(LocalServerPublicSetting.ID));
 		result.put("PORT", "" + port);
 	}
 
