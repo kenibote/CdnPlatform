@@ -64,6 +64,12 @@ public class LocalServerControl {
 		LocalServerPublicSetting.t_load = new Thread(LocalServerPublicSetting.loadbalanceserver);
 		LocalServerPublicSetting.t_load.start();
 
+		// 设置并启动Remote-balance服务
+		// Remote-balance 服务会使用到LocalServerPublicSetting中设置的端口号
+		LocalServerPublicSetting.remotebalanceserver = new RemoteBalanceServer();
+		LocalServerPublicSetting.t_remote = new Thread(LocalServerPublicSetting.remotebalanceserver);
+		LocalServerPublicSetting.t_remote.start();
+
 		// 设置并启动FileServerControl服务
 		// 这个类启动之后并没有什么副作用
 		LocalServerPublicSetting.fileservercontrol = new FileServerControl();

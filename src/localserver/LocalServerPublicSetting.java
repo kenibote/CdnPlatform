@@ -28,6 +28,8 @@ public class LocalServerPublicSetting {
 	// --------------------------
 	public static LoadBalanceServer loadbalanceserver = null;
 	public static Thread t_load = null;
+	public static RemoteBalanceServer remotebalanceserver = null;
+	public static Thread t_remote = null;
 	public static FileServerControl fileservercontrol = null;
 	public static Thread t_file = null;
 	// 记录本地服务的启动状态
