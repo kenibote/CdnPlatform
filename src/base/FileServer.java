@@ -3,8 +3,6 @@ package base;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -40,12 +38,9 @@ public class FileServer implements Runnable {
 	@Override
 	public void run() {
 		Socket s = null;
-		DataInputStream fis = null;
 		// ----------------------------
 		DataInputStream dis = null;
 		DataOutputStream ps = null;
-		String filePath = null;
-		File fi = null;
 
 		try {
 			// ss被提前，用于异步关闭线程
@@ -60,38 +55,30 @@ public class FileServer implements Runnable {
 
 				// 取得需要下载的文件名
 				dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
-				filePath = "D:\\" + dis.readUTF();
-				fi = new File(filePath);
-				logger.info("Port:" + port + ", File:" + filePath + ", File Length:" + (int) fi.length());
-
-				// 获得文件输入流，socket输出流
-				fis = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath)));
 				ps = new DataOutputStream(s.getOutputStream());
 
+				String filePath = dis.readUTF();
+				logger.info("Port:" + port + ", File:" + filePath);
+
 				// 传送文件
-				ps.writeUTF(fi.getName());
+				ps.writeUTF(filePath);
 				ps.flush();
-				ps.writeLong((long) fi.length());
+				ps.writeLong((long) 819200);
 				ps.flush();
 
 				int bufferSize = 8192;
 				byte[] buf = new byte[bufferSize];
 
-				while (true) {
-					int read = 0;
-					if (fis != null) {
-						read = fis.read(buf);
-					}
+				for (int i = 0; i < bufferSize; i++)
+					buf[i] = (byte) i;
 
-					if (read == -1) {
-						break;
-					}
-					ps.write(buf, 0, read);
-				}
+				for (int i = 1; i <= 100; i++)
+					ps.write(buf, 0, bufferSize);
+
 				ps.flush();
 
 				// 关闭文件流和socket链接
-				fis.close();
+				// fis.close();
 				s.close();
 				logger.info("Port:" + port + ", File Tran Completed.");
 				// 重新登记该端口可用
