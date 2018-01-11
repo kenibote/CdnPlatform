@@ -38,22 +38,27 @@ public class LoadBalanceServer implements Runnable {
 		result.clear();
 		int port = -1;
 		// 先检查本地是否有该内容
+		System.out.println("先检查本地是否有该内容？");
 		if (LocalServerPublicSetting.DoContentMap("FIND", LocalServerPublicSetting.ID, ID)) {
 			if ((port = FileServerControl.findAvailbaleServer()) != -1) {
 				// 如果本地有该内容,且本地可以服务
 				result.put("RESULT", "SUCCESS");
 				result.put("IP", LocalServerPublicSetting.Neighbor.get(LocalServerPublicSetting.ID));
 				result.put("PORT", "" + port);
+				
+				System.out.println("本地拥有该内容。");
 				return;
 			}
 		}
 
 		// 如果由于某种原因，本地无法提供服务；
+		System.out.println("开始检查邻居服务器是否有该内容？");
 		Iterator<String> it = LocalServerPublicSetting.Neighbor.keySet().iterator();
 		// 逐个查找远端服务器
 		while (it.hasNext()) {
 			String server = it.next();
 			if (LocalServerPublicSetting.DoContentMap("FIND", server, ID)) {
+				System.out.println("在该服务器发现存在该内容："+server);
 				// 尝试连接远端服务器
 				try {
 					socket = new Socket(LocalServerPublicSetting.Neighbor.get(server), server_port + 1);
@@ -73,6 +78,7 @@ public class LoadBalanceServer implements Runnable {
 						result.put("RESULT", "SUCCESS");
 						result.put("IP", (String) json.getOrDefault("IP", "NULL"));
 						result.put("PORT", (String) json.getOrDefault("PORT", "-1"));
+						System.out.println("确定该服务器存在该内容。"+server);
 						return;
 					}
 

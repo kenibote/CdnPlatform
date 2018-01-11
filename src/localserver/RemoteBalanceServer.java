@@ -27,6 +27,8 @@ public class RemoteBalanceServer implements Runnable {
 
 	// 由该函数查找指定服务器
 	private static void findServerForRemote(String ID) {
+		System.out.println("接受到远端请求，检查该内容现在是否可用？");
+		
 		result.clear();
 		// 如果服务不可用，port为-1；
 		int port = FileServerControl.findAvailbaleServer();
@@ -35,6 +37,7 @@ public class RemoteBalanceServer implements Runnable {
 			result.put("RESULT", "SUCCESS");
 			result.put("IP", LocalServerPublicSetting.Neighbor.get(LocalServerPublicSetting.ID));
 			result.put("PORT", "" + port);
+			System.out.println("目前服务器可用。");
 		} else {
 			result.put("RESULT", "FAIL");
 		}

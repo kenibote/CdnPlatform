@@ -1,5 +1,7 @@
 package localserver;
 
+import java.util.ArrayList;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,6 +20,18 @@ public class LocalServerMainFunction {
 		LocalServerBackTCP localserverbacktcp = new LocalServerBackTCP(8060);
 		Thread t = new Thread(localserverbacktcp);
 		t.start();
+		
+		// --------------------------------TEST----------------------------------
+		ArrayList<String> localserver1 = new ArrayList<>();
+		localserver1.add("test11.JPG");
+		localserver1.add("test12.JPG");
+
+		ArrayList<String> localserver2 = new ArrayList<>();
+		localserver2.add("test21.JPG");
+		localserver2.add("test22.JPG");
+
+		LocalServerPublicSetting.ContentMap.put("LocalServer1", localserver1);
+		LocalServerPublicSetting.ContentMap.put("LocalServer2", localserver2);
 	}
 
 }

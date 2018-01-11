@@ -25,7 +25,7 @@ public class LocalServerPublicSetting {
 	// 同级服务器信息 (ID,IP)
 	public static HashMap<String, String> Neighbor = new HashMap<>();
 	// TODO 考虑一下存储分布表是不是也要放在这里
-	private static HashMap<String, ArrayList<String>> ContentMap = new HashMap<>();
+	public static HashMap<String, ArrayList<String>> ContentMap = new HashMap<>();
 
 	// --------------------------
 	public static LoadBalanceServer loadbalanceserver = null;
