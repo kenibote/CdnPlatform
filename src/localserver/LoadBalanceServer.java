@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,21 +23,93 @@ public class LoadBalanceServer implements Runnable {
 	private static Logger logger = LogManager.getLogger(LoadBalanceServer.class.getName());
 
 	// 服务器监听端口，默认8070
-	private int server_port = LocalServerPublicSetting.LoadBalancePort;
+	private static int server_port = LocalServerPublicSetting.LoadBalancePort;
 	private static HashMap<String, String> result = new HashMap<>();
 
 	// 由该函数查找指定服务器
+	@SuppressWarnings("unchecked")
 	private static void findServer(String ID) {
-		/**
-		 * TODO 此处有大量逻辑代码需要完善； 先查找本地知否有该内容，如果有则检查服务是否可用； 如果没有，则请求别的服务器；
-		 */
 		// 如果服务不可用，port为-1；
-		int port = FileServerControl.findAvailbaleServer();
+		Socket socket = null;
+		BufferedReader input = null;
+		PrintWriter write = null;
+		JSONObject json = null;
 
 		result.clear();
-		result.put("RESULT", "SUCCESS");
-		result.put("IP", LocalServerPublicSetting.Neighbor.get(LocalServerPublicSetting.ID));
-		result.put("PORT", "" + port);
+		int port = -1;
+		// 先检查本地是否有该内容
+		if (LocalServerPublicSetting.DoContentMap("FIND", LocalServerPublicSetting.ID, ID)) {
+			if ((port = FileServerControl.findAvailbaleServer()) != -1) {
+				// 如果本地有该内容,且本地可以服务
+				result.put("RESULT", "SUCCESS");
+				result.put("IP", LocalServerPublicSetting.Neighbor.get(LocalServerPublicSetting.ID));
+				result.put("PORT", "" + port);
+				return;
+			}
+		}
+
+		// 如果由于某种原因，本地无法提供服务；
+		Iterator<String> it = LocalServerPublicSetting.Neighbor.keySet().iterator();
+		// 逐个查找远端服务器
+		while (it.hasNext()) {
+			String server = it.next();
+			if (LocalServerPublicSetting.DoContentMap("FIND", server, ID)) {
+				// 尝试连接远端服务器
+				try {
+					socket = new Socket(LocalServerPublicSetting.Neighbor.get(server), server_port + 1);
+					input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					write = new PrintWriter(socket.getOutputStream());
+
+					write.println("{\"ID\":\"" + ID + "\"}");
+					write.flush();
+
+					String command = input.readLine();
+					// 记得关闭socket端口
+					socket.close();
+
+					json = JSONObject.fromObject(command);
+					if ("SUCCESS".equals((String) json.getOrDefault("RESULT", "NULL"))) {
+						// 如果找到
+						result.put("RESULT", "SUCCESS");
+						result.put("IP", (String) json.getOrDefault("IP", "NULL"));
+						result.put("PORT", (String) json.getOrDefault("PORT", "-1"));
+						return;
+					}
+
+				} catch (Exception e) {
+
+				} // end try
+			} // end if
+		} // end while
+
+		// 最后，请求源服务器的帮助
+		try {
+			socket = new Socket(LocalServerPublicSetting.OriginalServerIP, server_port + 1);
+			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			write = new PrintWriter(socket.getOutputStream());
+
+			write.println("{\"ID\":\"" + ID + "\"}");
+			write.flush();
+
+			String command = input.readLine();
+			// 记得关闭socket端口
+			socket.close();
+
+			json = JSONObject.fromObject(command);
+			if ("SUCCESS".equals((String) json.getOrDefault("RESULT", "NULL"))) {
+				// 如果找到
+				result.put("RESULT", "SUCCESS");
+				result.put("IP", (String) json.getOrDefault("IP", "NULL"));
+				result.put("PORT", (String) json.getOrDefault("PORT", "-1"));
+			} else {
+				result.put("RESULT", "FAIL");
+			}
+
+			return;
+		} catch (Exception e) {
+
+		} // end try
+
 	}
 
 	@SuppressWarnings("unchecked")

@@ -2,6 +2,7 @@ package localserver;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import base.FileServerControl;
@@ -24,6 +25,7 @@ public class LocalServerPublicSetting {
 	// 同级服务器信息 (ID,IP)
 	public static HashMap<String, String> Neighbor = new HashMap<>();
 	// TODO 考虑一下存储分布表是不是也要放在这里
+	private static HashMap<String, ArrayList<String>> ContentMap = new HashMap<>();
 
 	// --------------------------
 	public static LoadBalanceServer loadbalanceserver = null;
@@ -34,4 +36,16 @@ public class LocalServerPublicSetting {
 	public static Thread t_file = null;
 	// 记录本地服务的启动状态
 	public static boolean localserverflag = false;
+
+	/**
+	 * 带锁的方法，负责查找一些内容；更新一些内容
+	 */
+	public synchronized static boolean DoContentMap(String gowhere, String server, String id) {
+		if ("FIND".equals(gowhere)) {
+			return ContentMap.get(server).contains(id);
+		}
+
+		// TODO 更新内容需要完善
+		return false;
+	}
 }
