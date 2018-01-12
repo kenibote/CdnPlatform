@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import base.FileServerControl;
+
 public class OriginalServerPublicSetting {
 	// 用于记录monitor的socket信息；
 	public static BufferedReader MonitorSocketInput = null;
@@ -24,4 +26,12 @@ public class OriginalServerPublicSetting {
 	public static HashMap<String, String> Neighbor = new HashMap<>();
 	// TODO 考虑一下存储分布表是不是也要放在这里
 	private static HashMap<String, ArrayList<String>> ContentMap = new HashMap<>();
+	
+	// --------------------------
+	public static OriginalRemoteBalanceServer originalremotebalanceserver = null;
+	public static Thread t_remote = null;
+	public static FileServerControl fileservercontrol = null;
+	public static Thread t_file = null;
+	// 记录源服务的启动状态
+	public static boolean originalserverflag = false;
 }

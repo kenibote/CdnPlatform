@@ -5,6 +5,7 @@ import java.util.HashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import base.FileServerControl;
 import net.sf.json.JSONObject;
 
 public class OriginalServerControl {
@@ -27,12 +28,130 @@ public class OriginalServerControl {
 		gowhere = (String) JSONObject.fromObject(commandin).getOrDefault("TYPE", "NULL");
 		// 命令路由表
 		switch (gowhere) {
+		case "TASK_001":
+			HELLO();
+			break;
+
+		case "TASK_007":
+			OriginalServerSet(commandin);
+			break;
+
+		case "TASK_008":
+			initOriginalServer();
+			break;
+
+		case "TASK_000":
+			startOriginalServer();
+			break;
+
+		case "TASK_010":
+			stopOriginalServer();
+			break;
 
 		// 如果没有匹配到任何task
 		default:
 			Default();
 		}
 
+	}
+
+	public static void initOriginalServer() {
+		// 设置并启动Remote-balance服务
+		// Remote-balance 服务会使用到LocalServerPublicSetting中设置的端口号
+		OriginalServerPublicSetting.originalremotebalanceserver = new OriginalRemoteBalanceServer();
+		OriginalServerPublicSetting.t_remote = new Thread(OriginalServerPublicSetting.originalremotebalanceserver);
+		OriginalServerPublicSetting.t_remote.start();
+
+		// 设置并启动FileServerControl服务
+		// 这个类启动之后并没有什么副作用
+		OriginalServerPublicSetting.fileservercontrol = new FileServerControl();
+		OriginalServerPublicSetting.t_file = new Thread(OriginalServerPublicSetting.fileservercontrol);
+		OriginalServerPublicSetting.t_file.start();
+
+		initResult("INIT");
+		result.put("CODE", "TASK_008");
+		result.put("STATE", "SUCCESS");
+		initResult("SEND");
+	}
+
+	public static void startOriginalServer() {
+		initResult("INIT");
+
+		if (!OriginalServerPublicSetting.originalserverflag) {
+			// 启动文件下载服务
+			FileServerControl.setPort(OriginalServerPublicSetting.Start_port, OriginalServerPublicSetting.End_port);
+			FileServerControl.initFileServer();
+			FileServerControl.startFileServer();
+
+			result.put("CODE", "TASK_009");
+			result.put("STATE", "SUCCESS");
+
+			OriginalServerPublicSetting.originalserverflag = true;
+		} else {
+			result.put("CODE", "ERROR_5");
+		}
+
+		initResult("SEND");
+	}
+
+	public static void stopOriginalServer() {
+		initResult("INIT");
+		if (OriginalServerPublicSetting.originalserverflag) {
+			// 关闭FileServerControl服务
+			FileServerControl.stopFileServer();
+
+			result.put("CODE", "TASK_010");
+			result.put("STATE", "SUCCESS");
+
+			OriginalServerPublicSetting.originalserverflag = false;
+		} else {
+			result.put("CODE", "ERROR_6");
+		}
+
+		initResult("SEND");
+	}
+
+	@SuppressWarnings("unchecked")
+	public static void OriginalServerSet(String commandin) {
+		json = JSONObject.fromObject(commandin);
+
+		// OriginalServer端的ID
+		OriginalServerPublicSetting.ID = (String) json.getOrDefault("ID", "NULL");
+		// 原服务器信息
+		OriginalServerPublicSetting.OriginalServerIP = (String) json.getOrDefault("OriginalServerIP", "NULL");
+		OriginalServerPublicSetting.RemoteBalancePort = Integer
+				.parseInt((String) json.getOrDefault("RemoteBalancePort", "0"));
+		// 服务能力（起始与终止端口）
+		OriginalServerPublicSetting.Start_port = Integer.parseInt((String) json.getOrDefault("StartPort", "0"));
+		OriginalServerPublicSetting.End_port = Integer.parseInt((String) json.getOrDefault("EndPort", "0"));
+
+		// 记录邻居信息
+		int neighbor_number = Integer.parseInt((String) json.getOrDefault("LocalServerNumber", "0"));
+		OriginalServerPublicSetting.Neighbor.clear();
+		for (int i = 1; i <= neighbor_number; i++) {
+			// 注意这里json传递的信息和实际记录在OriginalServerPublicSetting中的信息并不一样
+			String KEY = "Neighbor" + i;
+			String NeighborIP = (String) json.getOrDefault(KEY, "NULL");
+			OriginalServerPublicSetting.Neighbor.put("LocalServer" + i, NeighborIP);
+		}
+
+		logger.info("Setting Updated!");
+		initResult("INIT");
+		result.put("CODE", "TASK_007");
+		result.put("STATE", "SUCCESS");
+		initResult("SEND");
+
+	}
+
+	// HELLO包
+	public static void HELLO() {
+		logger.info("HELLO package");
+
+		initResult("INIT");
+		result.put("CODE", "TASK_001");
+		result.put("STATE", "SUCCESS");
+
+		initResult("SEND");
 	}
 
 	/**

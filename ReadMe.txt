@@ -19,14 +19,25 @@ ERROR_001 : KEY错误，鉴权错误
 ERROR_002 : 未知任务类型
 ERROR_003 : LOCALSERVER服务已经启动
 ERROR_004 : LOCALSERVER服务已经关闭
+--------------------------------------------------------------------------------
+ERROR_005 : OriginalServer服务已启动
+ERROR_006 : OriginalServer服务已关闭
+
 
 TASK信息：
 TASK_001 : 通用hello包
 TASK_002 : 设置ID，优先IP，等参数……包(MONITOR-->USER)
+--------------------------------------------------------------------------------
 TASK_003 : 设置ID,原服务器IP:PORT, 服务能力(端口号范围)，邻居地址等... (MONITOR-->LOCALSERVER)
 TASK_004 ：localserver初始化一些设置
 TASK_005 ：monitor启动localServer
 TASK_006 : monitor关闭localServer
+--------------------------------------------------------------------------------
+TASK_007 : monitor设置OriginalServer
+TASK_008 : originalServer初始化工作
+TASK_009 : MONITOR启动OriginalServer
+TASK_010 : MONITOR关闭OriginalServer
+
 
 
 monitor --> user的通信格式：
