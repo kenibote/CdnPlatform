@@ -15,7 +15,7 @@ public class FileServerV2 implements Runnable {
 	 * 文件服务子线程，在创建该线程时候需要初始化端口号; 该子函数，首先由客户端提供一个文件名，之后向用户传递指定文件。
 	 * v2与v1的不同在于，v2不需要打开文件，读取文件，而是直接从内存中传递一个指定的内容！！！ size可以指定传递文件的大小。
 	 */
-	private static Logger logger = LogManager.getLogger(FileServer.class.getName());
+	private static Logger logger = LogManager.getLogger(FileServerV2.class.getName());
 
 	private int port = 8001;
 	private int size = 100;
