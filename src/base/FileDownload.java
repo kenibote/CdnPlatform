@@ -28,6 +28,7 @@ public class FileDownload implements Runnable {
 	private int ID = 0;
 	private long start_time = 0;
 	private long end_time = 0;
+	private TaskInfo task = null;
 
 	/**
 	 * run()函数的一个运行思路：
@@ -41,6 +42,7 @@ public class FileDownload implements Runnable {
 		
 		try {
 			// 与本地服务器建立连接
+			start_time = System.currentTimeMillis();
 			Socket socket = new Socket(ip, port);
 			BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			PrintWriter write = new PrintWriter(socket.getOutputStream());
@@ -56,6 +58,14 @@ public class FileDownload implements Runnable {
 
 			// 关闭连接
 			socket.close();
+			end_time = System.currentTimeMillis();
+			
+			// 记录信息
+			if(task!=null){
+				task.task_server_ip = ip;
+				task.task_server_port = port;
+				task.redirect_time = end_time - start_time;
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -70,6 +80,10 @@ public class FileDownload implements Runnable {
 		end_time = System.currentTimeMillis();
 		// 记录下载时间与下载结果
 		logger.info(ID + ":" + (end_time - start_time) + ":" + result);
+		if(task!=null){
+			task.download_time = end_time - start_time;
+			task.task_flag = true;
+		}
 	}
 
 	// 通用下载函数
@@ -94,6 +108,15 @@ public class FileDownload implements Runnable {
 		this.port = server_port;
 		this.sendMessage = targetfile;
 		this.ID = taskid;
+	}
+	
+	public FileDownload(TaskInfo taskinfo){
+		this.task = taskinfo;
+		
+		this.ip = taskinfo.task_from;
+		this.port = taskinfo.load_balance_port;
+		this.ID = taskinfo.task_id;
+		this.sendMessage = taskinfo.file_name;
 	}
 
 	private boolean createConnection() {

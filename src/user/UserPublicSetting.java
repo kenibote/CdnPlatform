@@ -2,6 +2,9 @@ package user;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+
+import base.TaskInfo;
 
 public class UserPublicSetting {
 	// 用于记录monitor的socket信息；
@@ -13,5 +16,7 @@ public class UserPublicSetting {
 	public static String ID = "NULL";
 	public static String LocalServerIP = "NULL";
 	public static int LocalServerPort = 0;
+	
+	public static ArrayList<TaskInfo> TaskList = new ArrayList<>();
 	
 }
