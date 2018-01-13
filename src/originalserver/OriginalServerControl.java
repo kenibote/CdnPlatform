@@ -40,7 +40,7 @@ public class OriginalServerControl {
 			initOriginalServer();
 			break;
 
-		case "TASK_000":
+		case "TASK_009":
 			startOriginalServer();
 			break;
 
