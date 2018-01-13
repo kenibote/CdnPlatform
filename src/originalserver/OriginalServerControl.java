@@ -1,6 +1,7 @@
 package originalserver;
 
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -150,6 +151,20 @@ public class OriginalServerControl {
 		initResult("INIT");
 		result.put("CODE", "TASK_001");
 		result.put("STATE", "SUCCESS");
+		
+		result.put("OriginalServerIP", OriginalServerPublicSetting.OriginalServerIP);
+		result.put("RemoteBalancePort", "" + OriginalServerPublicSetting.RemoteBalancePort);
+
+		result.put("StartPort", "" + OriginalServerPublicSetting.Start_port);
+		result.put("EndPort", "" + OriginalServerPublicSetting.End_port);
+
+		result.put("LocalServerNumber", "" + OriginalServerPublicSetting.Neighbor.size());
+		Iterator<String> it = OriginalServerPublicSetting.Neighbor.keySet().iterator();
+		while (it.hasNext()) {
+			String key = it.next();
+			result.put(key, OriginalServerPublicSetting.Neighbor.get(key));
+		}
+		result.put("OriginalServerStatus", OriginalServerPublicSetting.originalserverflag + "");
 
 		initResult("SEND");
 	}
