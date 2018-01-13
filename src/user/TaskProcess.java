@@ -1,5 +1,7 @@
 package user;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.logging.log4j.LogManager;
@@ -43,7 +45,32 @@ public class TaskProcess implements Runnable {
 		// 标记任务结束
 		UserPublicSetting.SimulationFlag = false;
 
-		// 之后调用数据统计服务
+		// 之后调用数据统计服务,写入到文件中
+		UserPublicSetting.FileResult = UserPublicSetting.FileName + "-" + System.currentTimeMillis();
+		String saveFile = UserPublicSetting.FilePix + UserPublicSetting.FileResult + ".csv";
+
+		try {
+			FileWriter fout = new FileWriter(saveFile);
+
+			it = UserPublicSetting.TaskList.iterator();
+			while (it.hasNext()) {
+				task = it.next();
+				// 按照TaskInfo中的顺序
+				String output = task.wait_time + "," + task.task_from + "," + task.load_balance_port + ","
+						+ task.task_id + "," + task.file_name + "," + task.task_server_ip + "," + task.task_server_port
+						+ "," + task.redirect_time + "," + task.download_time + ",\r\n";
+
+				fout.write(output);
+			}
+
+			// 关闭文件
+			fout.flush();
+			fout.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	// 测试代码

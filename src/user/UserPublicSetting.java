@@ -22,4 +22,8 @@ public class UserPublicSetting {
 	// 用于记录仿真状态
 	public static boolean SimulationFlag = false;
 	public static double SimulationStatus = 0;
+	// 注意，这个filename不带csv
+	public static String FilePix = "E:\\";
+	public static String FileName = null;
+	public static String FileResult = null;
 }

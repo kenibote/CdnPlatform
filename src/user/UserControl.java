@@ -65,18 +65,19 @@ public class UserControl {
 
 		// 提取文件信息
 		json = JSONObject.fromObject(commandin);
-		String filename = (String) json.getOrDefault("FileName", "NULL");
+		UserPublicSetting.FileName = (String) json.getOrDefault("FileName", "NULL");
 		String IP = (String) json.getOrDefault("MonitorIP", "NULL");
 		int port = Integer.parseInt((String) json.getOrDefault("MonitorPort", "NULL"));
 
 		// 下载指定文件
-		new FileDownload(IP, port, filename, 0).download();
+		new FileDownload(IP, port, UserPublicSetting.FileName + ".csv", 0).download();
 
 		// 载入文件
 		UserPublicSetting.TaskList.clear();
 		try {
 			// 打开文件
-			BufferedReader fin = new BufferedReader(new FileReader("E:\\" + filename));
+			BufferedReader fin = new BufferedReader(
+					new FileReader(UserPublicSetting.FilePix + UserPublicSetting.FileName + ".csv"));
 			String readin = null;
 			while ((readin = fin.readLine()) != null) {
 				String[] info = readin.split(",");
