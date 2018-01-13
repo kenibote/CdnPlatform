@@ -45,6 +45,13 @@ public class TaskProcess implements Runnable {
 		// 标记任务结束
 		UserPublicSetting.SimulationFlag = false;
 
+		// 等待下载任务结束
+		try {
+			Thread.sleep(1000*5);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
+		
 		// 之后调用数据统计服务,写入到文件中
 		UserPublicSetting.FileResult = UserPublicSetting.FileName + "-" + System.currentTimeMillis();
 		String saveFile = UserPublicSetting.FilePix + UserPublicSetting.FileResult + ".csv";
