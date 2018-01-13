@@ -1,10 +1,14 @@
 package user;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.HashMap;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import base.FileDownload;
+import base.TaskInfo;
 import net.sf.json.JSONObject;
 
 public class UserControl {
@@ -36,11 +40,91 @@ public class UserControl {
 			UsuallySet(commandin);
 			break;
 
+		case "TASK_011":
+			loadTask(commandin);
+			break;
+
+		case "TASK_012":
+			startSimulation();
+			break;
+
+		case "TASK_013":
+			checkTaskProcess();
+			break;
+
 		// 如果没有匹配到任何task
 		default:
 			Default();
 		}
 
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	public static void loadTask(String commandin) {
+		logger.info("Loading Task...");
+
+		// 提取文件信息
+		json = JSONObject.fromObject(commandin);
+		String filename = (String) json.getOrDefault("FileName", "NULL");
+		String IP = (String) json.getOrDefault("MonitorIP", "NULL");
+		int port = Integer.parseInt((String) json.getOrDefault("MonitorPort", "NULL"));
+
+		// 下载指定文件
+		new FileDownload(IP, port, filename, 0).download();
+
+		// 载入文件
+		UserPublicSetting.TaskList.clear();
+		try {
+			// 打开文件
+			BufferedReader fin = new BufferedReader(new FileReader("E:\\" + filename));
+			String readin = null;
+			while ((readin = fin.readLine()) != null) {
+				String[] info = readin.split(",");
+
+				TaskInfo task = new TaskInfo();
+				task.wait_time = Integer.parseInt(info[0]);
+				task.task_from = info[1];
+				task.load_balance_port = Integer.parseInt(info[2]);
+				task.task_id = Integer.parseInt(info[3]);
+				task.file_name = info[4];
+
+				UserPublicSetting.TaskList.add(task);
+			}
+
+			// 关闭文件
+			fin.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		initResult("INIT");
+		result.put("CODE", "TASK_011");
+		result.put("STATE", "SUCCESS");
+		initResult("SEND");
+	}
+
+	public static void checkTaskProcess() {
+		logger.info("Check Task Process...");
+
+		initResult("INIT");
+		result.put("CODE", "TASK_013");
+		result.put("STATE", "SUCCESS");
+		result.put("TASKFLAG", UserPublicSetting.SimulationFlag + "");
+		result.put("PROGRESS", UserPublicSetting.SimulationStatus + "");
+		initResult("SEND");
+	}
+
+	public static void startSimulation() {
+		logger.info("Start simulation...");
+
+		// 启动任务执行线程
+		new Thread(new TaskProcess()).start();
+
+		initResult("INIT");
+		result.put("CODE", "TASK_012");
+		result.put("STATE", "SUCCESS");
+		initResult("SEND");
 	}
 
 	/**
