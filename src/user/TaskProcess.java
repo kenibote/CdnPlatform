@@ -14,7 +14,11 @@ public class TaskProcess implements Runnable {
 	@Override
 	public void run() {
 		logger.info("Task Process Start...");
+		// 标记任务启动
+		UserPublicSetting.SimulationFlag = true;
 
+		double total_task = UserPublicSetting.TaskList.size();
+		double point = 0.0;
 		TaskInfo task = null;
 		Iterator<TaskInfo> it = UserPublicSetting.TaskList.iterator();
 		while (it.hasNext()) {
@@ -30,7 +34,16 @@ public class TaskProcess implements Runnable {
 			// 启动任务
 			logger.debug("start task - " + task.task_id);
 			new Thread(new FileDownload(task)).start();
+
+			// 标记任务执行进度
+			point = point + 1.0;
+			UserPublicSetting.SimulationStatus = point / total_task;
 		}
+
+		// 标记任务结束
+		UserPublicSetting.SimulationFlag = false;
+
+		// 之后调用数据统计服务
 	}
 
 	// 测试代码

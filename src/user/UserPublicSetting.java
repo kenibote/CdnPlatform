@@ -19,4 +19,7 @@ public class UserPublicSetting {
 	
 	public static ArrayList<TaskInfo> TaskList = new ArrayList<>();
 	
+	// 用于记录仿真状态
+	public static boolean SimulationFlag = false;
+	public static double SimulationStatus = 0;
 }
