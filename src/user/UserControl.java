@@ -113,6 +113,7 @@ public class UserControl {
 		result.put("STATE", "SUCCESS");
 		result.put("TASKFLAG", UserPublicSetting.SimulationFlag + "");
 		result.put("PROGRESS", UserPublicSetting.SimulationStatus + "");
+		result.put("RESULTNAME", UserPublicSetting.FileResult);
 		initResult("SEND");
 	}
 
