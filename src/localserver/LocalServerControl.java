@@ -36,6 +36,10 @@ public class LocalServerControl {
 		case "TASK_003":
 			localserverSet(commandin);
 			break;
+			
+		case "TASK_014":
+			UpdataContentMap(commandin);
+			break;
 
 		case "TASK_004":
 			initLocalServer();
@@ -55,6 +59,17 @@ public class LocalServerControl {
 		}
 
 	}
+	
+	
+	public static void UpdataContentMap(String commandin){
+		LocalServerPublicSetting.DoContentMap("INIT", commandin, "");
+		
+		initResult("INIT");
+		result.put("CODE", "TASK_014");
+		result.put("STATE", "SUCCESS");
+		initResult("SEND");
+	}
+	
 
 	public static void initLocalServer() {
 

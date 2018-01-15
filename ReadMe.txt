@@ -29,6 +29,7 @@ TASK_001 : 通用hello包
 TASK_002 : 设置ID，优先IP，等参数……包(MONITOR-->USER)
 --------------------------------------------------------------------------------
 TASK_003 : 设置ID,原服务器IP:PORT, 服务能力(端口号范围)，邻居地址等... (MONITOR-->LOCALSERVER)
+TASK_014 : 下发ContentMap表
 TASK_004 ：localserver初始化一些设置
 TASK_005 ：monitor启动localServer
 TASK_006 : monitor关闭localServer

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import base.FileServerControl;
+import net.sf.json.JSONObject;
 
 public class LocalServerPublicSetting {
 	// 用于记录monitor的socket信息；
@@ -58,7 +59,32 @@ public class LocalServerPublicSetting {
 			return ContentMap.get(server).contains(id);
 		}
 
+		// 初始化操作
+		if ("INIT".equals(gowhere)) {
+			// 先清除所有内容
+			ContentMap.clear();
+
+			JSONObject json = JSONObject.fromObject(server);
+
+			// 按照Neighbor中的信息读取内容
+			for (String e : Neighbor.keySet()) {
+				String a = json.getString(e);
+				String[] c = a.split("-");
+
+				// 创建新的列表
+				ArrayList<String> lis = new ArrayList<>();
+				// 载入列表
+				for (String ee : c)
+					lis.add(ee);
+
+				// 将这些信息加入在Map中
+				ContentMap.put(e, lis);
+			}
+
+		}
+
 		// TODO 更新内容需要完善
+
 		return false;
 	}
 }
