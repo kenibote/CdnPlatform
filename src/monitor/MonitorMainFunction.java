@@ -14,6 +14,10 @@ public class MonitorMainFunction {
 			// HELLO
 			back = MonitorSetting.Usually(MonitorSetting.local_server_info.get(i), 8090, "LocalServer", "TASK_001");
 			System.out.println(back);
+			
+			// UpdataMap
+			back = MonitorSetting.SetLocalServerMap(i);
+			System.out.println(back);
 
 			// INIT
 			back = MonitorSetting.Usually(MonitorSetting.local_server_info.get(i), 8090, "LocalServer", "TASK_004");
