@@ -98,6 +98,9 @@ public class LocalServerControl {
 			result.put("STATE", "SUCCESS");
 
 			LocalServerPublicSetting.localserverflag = true;
+			
+			// 必须在flag置为true之后，才可以启动统计服务
+			new Thread(new LocalServerStatic()).start();
 		} else {
 			result.put("CODE", "ERROR_3");
 		}

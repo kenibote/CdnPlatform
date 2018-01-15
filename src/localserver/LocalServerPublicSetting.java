@@ -37,6 +37,19 @@ public class LocalServerPublicSetting {
 	// 记录本地服务的启动状态
 	public static boolean localserverflag = false;
 
+	// ------------到达率统计相关---------------
+	public static int time_period = 1000;
+	// 用于记录总请求数
+	public static int total_arrival = 0;
+	// 用于检测各个时间段的到达率
+	public static HashMap<Integer, Integer> total_arrival_rate = new HashMap<>();
+	// 用于记录总内容数目
+	public static double Content_N = 0.0;
+	// 用于记录每个content被请求了多少次
+	public static HashMap<String, Integer> content_count = new HashMap<>();
+	// Sanjay教授法，用于统计每个内容的实时喜好程度
+	public static HashMap<String, Double> content_live_like = new HashMap<>();
+
 	/**
 	 * 带锁的方法，负责查找一些内容；更新一些内容
 	 */
