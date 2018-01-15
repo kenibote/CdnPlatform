@@ -21,8 +21,8 @@ public class UserBackTCP implements Runnable {
 	 */
 	private static Logger logger = LogManager.getLogger(UserBackTCP.class.getName());
 
-	// 服务器监听端口，默认8060
-	private int server_port = 8060;
+	// 服务器监听端口，默认8091
+	private int server_port = 8091;
 
 	public UserBackTCP(int port) {
 		this.server_port = port;

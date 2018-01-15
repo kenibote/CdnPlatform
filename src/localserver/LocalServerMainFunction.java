@@ -15,7 +15,7 @@ public class LocalServerMainFunction {
 		 */
 
 		logger.info("LocalServer Start ...");
-		LocalServerBackTCP localserverbacktcp = new LocalServerBackTCP(8060);
+		LocalServerBackTCP localserverbacktcp = new LocalServerBackTCP(8090);
 		Thread t = new Thread(localserverbacktcp);
 		t.start();
 	}

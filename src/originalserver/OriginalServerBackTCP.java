@@ -20,7 +20,7 @@ public class OriginalServerBackTCP implements Runnable {
 	private static Logger logger = LogManager.getLogger(OriginalServerBackTCP.class.getName());
 
 	// 服务器监听端口，默认8060
-	private int server_port = 8060;
+	private int server_port = 8090;
 
 	public OriginalServerBackTCP(int port) {
 		this.server_port = port;

@@ -13,7 +13,7 @@ public class OriginalServerMainFunction {
 		 */
 
 		logger.info("OriginalServer Start ...");
-		OriginalServerBackTCP originalserverbacktcp = new OriginalServerBackTCP(8060);
+		OriginalServerBackTCP originalserverbacktcp = new OriginalServerBackTCP(8090);
 		Thread t = new Thread(originalserverbacktcp);
 		t.start();
 	}

@@ -19,8 +19,8 @@ public class LocalServerBackTCP implements Runnable {
 	 * */
 	private static Logger logger = LogManager.getLogger(LocalServerBackTCP.class.getName());
 
-	// 服务器监听端口，默认8060
-	private int server_port = 8060;
+	// 服务器监听端口，默认8090
+	private int server_port = 8090;
 
 	public LocalServerBackTCP(int port) {
 		this.server_port = port;
