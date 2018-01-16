@@ -40,6 +40,7 @@ public class FileDownload implements Runnable {
 	public void run() {
 		// TODO 此处还有大量代码需要完善
 		JSONObject json = null;
+		boolean flag = false;
 
 		try {
 			// 与本地服务器建立连接
@@ -63,6 +64,7 @@ public class FileDownload implements Runnable {
 			if ("SUCCESS".equals(json.getString("RESULT"))) {
 				ip = (String) json.getOrDefault("IP", "NULL");
 				port = Integer.parseInt((String) json.getOrDefault("PORT", "0"));
+				flag = true;
 			} else {
 				// 如果失败
 				String[] redirect = json.getString("REDIRECT").split("-");
@@ -84,11 +86,12 @@ public class FileDownload implements Runnable {
 					if ("SUCCESS".equals(json.getString("RESULT"))) {
 						ip = (String) json.getOrDefault("IP", "NULL");
 						port = Integer.parseInt((String) json.getOrDefault("PORT", "0"));
+						flag = true;
 						// 跳出for循环
 						break;
 					}
-				}// end for
-			}// end else
+				} // end for
+			} // end else
 
 			end_time = System.currentTimeMillis();
 
@@ -104,17 +107,19 @@ public class FileDownload implements Runnable {
 
 		// ---------------------------------------------------------------------------------------
 
-		// 记录起始时间
-		start_time = System.currentTimeMillis();
-		// 开始下载
-		boolean result = download();
-		// 记录结束时间
-		end_time = System.currentTimeMillis();
-		// 记录下载时间与下载结果
-		logger.info(ID + ":" + (end_time - start_time) + ":" + result);
-		if (task != null) {
-			task.download_time = end_time - start_time;
-			task.task_flag = true;
+		if (flag) {
+			// 记录起始时间
+			start_time = System.currentTimeMillis();
+			// 开始下载
+			boolean result = download();
+			// 记录结束时间
+			end_time = System.currentTimeMillis();
+			// 记录下载时间与下载结果
+			logger.info(ID + ":" + (end_time - start_time) + ":" + result);
+			if (task != null) {
+				task.download_time = end_time - start_time;
+				task.task_flag = true;
+			}
 		}
 	}
 
