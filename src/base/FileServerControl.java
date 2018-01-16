@@ -82,8 +82,8 @@ public class FileServerControl implements Runnable {
 			// 记录端口号
 			fsi.port = port;
 			// 记录线程信息，稍后启动线程
-			fsi.fileserver = new FileServer(port);
-			fsi.thread = new Thread(fsi.fileserver);
+			// fsi.fileserver = new FileServer(port);
+			// fsi.thread = new Thread(fsi.fileserver);
 
 			// 端口号往后移动
 			port++;
@@ -105,6 +105,9 @@ public class FileServerControl implements Runnable {
 				while (port <= end_port) {
 					if (ThreadPool.get(port).fss == FileServerStatus.OFF) {
 						logger.info("Start Thread " + port);
+						FileServer fs = new FileServer(port);
+						ThreadPool.get(port).fileserver =  fs;
+						ThreadPool.get(port).thread = new Thread(fs);
 						ThreadPool.get(port).thread.start();
 					}
 
