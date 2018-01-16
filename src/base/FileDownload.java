@@ -39,7 +39,8 @@ public class FileDownload implements Runnable {
 	@Override
 	public void run() {
 		// TODO 此处还有大量代码需要完善
-		
+		JSONObject json = null;
+
 		try {
 			// 与本地服务器建立连接
 			start_time = System.currentTimeMillis();
@@ -53,15 +54,46 @@ public class FileDownload implements Runnable {
 
 			// 接收重定向信息，并修改本地信息
 			String command = input.readLine();
-			ip = (String) JSONObject.fromObject(command).getOrDefault("IP", "NULL");
-			port = Integer.parseInt((String) JSONObject.fromObject(command).getOrDefault("PORT", "NULL"));
-
 			// 关闭连接
 			socket.close();
+			// ---------------------------------------------------------------------------------------
+
+			json = JSONObject.fromObject(command);
+			// 如果成功
+			if ("SUCCESS".equals(json.getString("RESULT"))) {
+				ip = (String) json.getOrDefault("IP", "NULL");
+				port = Integer.parseInt((String) json.getOrDefault("PORT", "0"));
+			} else {
+				// 如果失败
+				String[] redirect = json.getString("REDIRECT").split("-");
+				// 逐个查找重定向列表
+				for (String server : redirect) {
+					// 建立连接
+					socket = new Socket(server, 8071);
+					input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+					write = new PrintWriter(socket.getOutputStream());
+					// 发送任务请求
+					write.println("{\"ID\":\"" + sendMessage + "\"}");
+					write.flush();
+					// 收到回复，即时关闭连接
+					command = input.readLine();
+					socket.close();
+
+					// 如果有空闲资源
+					json = JSONObject.fromObject(command);
+					if ("SUCCESS".equals(json.getString("RESULT"))) {
+						ip = (String) json.getOrDefault("IP", "NULL");
+						port = Integer.parseInt((String) json.getOrDefault("PORT", "0"));
+						// 跳出for循环
+						break;
+					}
+				}// end for
+			}// end else
+
 			end_time = System.currentTimeMillis();
-			
+
 			// 记录信息
-			if(task!=null){
+			if (task != null) {
 				task.task_server_ip = ip;
 				task.task_server_port = port;
 				task.redirect_time = end_time - start_time;
@@ -80,7 +112,7 @@ public class FileDownload implements Runnable {
 		end_time = System.currentTimeMillis();
 		// 记录下载时间与下载结果
 		logger.info(ID + ":" + (end_time - start_time) + ":" + result);
-		if(task!=null){
+		if (task != null) {
 			task.download_time = end_time - start_time;
 			task.task_flag = true;
 		}
@@ -109,10 +141,10 @@ public class FileDownload implements Runnable {
 		this.sendMessage = targetfile;
 		this.ID = taskid;
 	}
-	
-	public FileDownload(TaskInfo taskinfo){
+
+	public FileDownload(TaskInfo taskinfo) {
 		this.task = taskinfo;
-		
+
 		this.ip = taskinfo.task_from;
 		this.port = taskinfo.load_balance_port;
 		this.ID = taskinfo.task_id;

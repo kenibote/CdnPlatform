@@ -60,7 +60,7 @@ public class FileServer implements Runnable {
 
 				// 取得需要下载的文件名
 				dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
-				filePath = "D:\\" + dis.readUTF();
+				filePath = "D:\\Content\\" + dis.readUTF();
 				fi = new File(filePath);
 				logger.info("Port:" + port + ", File:" + filePath + ", File Length:" + (int) fi.length());
 

@@ -27,88 +27,38 @@ public class LoadBalanceServer implements Runnable {
 	private static HashMap<String, String> result = new HashMap<>();
 
 	// 由该函数查找指定服务器
-	@SuppressWarnings("unchecked")
 	private static void findServer(String ID) {
-		// 如果服务不可用，port为-1；
-		Socket socket = null;
-		BufferedReader input = null;
-		PrintWriter write = null;
-		JSONObject json = null;
-
 		result.clear();
+
+		// 如果服务不可用，port为-1；
 		int port = -1;
 		// 先检查本地是否有该内容
 		if (LocalServerPublicSetting.DoContentMap("FIND", LocalServerPublicSetting.ID, ID)) {
 			if ((port = FileServerControl.findAvailbaleServer()) != -1) {
 				// 如果本地有该内容,且本地可以服务
 				result.put("RESULT", "SUCCESS");
-				result.put("IP", LocalServerPublicSetting.Neighbor.get(LocalServerPublicSetting.ID));
+				result.put("IP", "192.168.1.101");
 				result.put("PORT", "" + port);
 				return;
 			}
 		}
 
+		String redirect = "";
 		// 如果由于某种原因，本地无法提供服务；
 		Iterator<String> it = LocalServerPublicSetting.Neighbor.keySet().iterator();
 		// 逐个查找远端服务器
 		while (it.hasNext()) {
 			String server = it.next();
-			if (LocalServerPublicSetting.DoContentMap("FIND", server, ID)) {
-				// 尝试连接远端服务器
-				try {
-					socket = new Socket(LocalServerPublicSetting.Neighbor.get(server), server_port + 1);
-					input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-					write = new PrintWriter(socket.getOutputStream());
-
-					write.println("{\"ID\":\"" + ID + "\"}");
-					write.flush();
-
-					String command = input.readLine();
-					// 记得关闭socket端口
-					socket.close();
-
-					json = JSONObject.fromObject(command);
-					if ("SUCCESS".equals((String) json.getOrDefault("RESULT", "NULL"))) {
-						// 如果找到
-						result.put("RESULT", "SUCCESS");
-						result.put("IP", (String) json.getOrDefault("IP", "NULL"));
-						result.put("PORT", (String) json.getOrDefault("PORT", "-1"));
-						return;
-					}
-
-				} catch (Exception e) {
-
-				} // end try
+			// 如果目标服务器有该内容，且不是自己
+			if (LocalServerPublicSetting.DoContentMap("FIND", server, ID)
+					&& (!server.equals(LocalServerPublicSetting.ID))) {
+				// 获取目标服务器地址
+				redirect = redirect + LocalServerPublicSetting.Neighbor.get(server) + "-";
 			} // end if
 		} // end while
-
-		// 最后，请求源服务器的帮助
-		try {
-			socket = new Socket(LocalServerPublicSetting.OriginalServerIP, server_port + 1);
-			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			write = new PrintWriter(socket.getOutputStream());
-
-			write.println("{\"ID\":\"" + ID + "\"}");
-			write.flush();
-
-			String command = input.readLine();
-			// 记得关闭socket端口
-			socket.close();
-
-			json = JSONObject.fromObject(command);
-			if ("SUCCESS".equals((String) json.getOrDefault("RESULT", "NULL"))) {
-				// 如果找到
-				result.put("RESULT", "SUCCESS");
-				result.put("IP", (String) json.getOrDefault("IP", "NULL"));
-				result.put("PORT", (String) json.getOrDefault("PORT", "-1"));
-			} else {
-				result.put("RESULT", "FAIL");
-			}
-
-			return;
-		} catch (Exception e) {
-
-		} // end try
+		redirect = redirect + LocalServerPublicSetting.OriginalServerIP;
+		result.put("RESULT", "FAIL");
+		result.put("REDIRECT", redirect);
 
 	}
 
@@ -147,19 +97,6 @@ public class LoadBalanceServer implements Runnable {
 
 					// 统计到达率
 					LocalServerPublicSetting.total_arrival++;
-					// 对该内容加1
-					LocalServerPublicSetting.content_count.put(id, LocalServerPublicSetting.content_count.get(id) + 1);
-					// 对每一个内容执行sanjay操作 (已经优化)
-					double like_log = LocalServerPublicSetting.content_live_like.get(id);
-					like_log = (like_log * LocalServerPublicSetting.Content_N + 1)
-							/ (LocalServerPublicSetting.Content_N + 1);
-					for (String key : LocalServerPublicSetting.content_live_like.keySet()) {
-						double like = LocalServerPublicSetting.content_live_like.get(key);
-						like = (like * LocalServerPublicSetting.Content_N) / (LocalServerPublicSetting.Content_N + 1);
-						LocalServerPublicSetting.content_live_like.put(key, like);
-					}
-					// 对指定内容执行另一个sanjay操作
-					LocalServerPublicSetting.content_live_like.put(id, like_log);
 
 					// 由该函数查找指定服务器
 					findServer(id);
