@@ -60,7 +60,7 @@ public class FileServer implements Runnable {
 
 				// 取得需要下载的文件名
 				dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
-				filePath = "D:\\" + dis.readUTF();
+				filePath = "D:\\Content\\" + dis.readUTF();
 				fi = new File(filePath);
 				logger.info("Port:" + port + ", File:" + filePath + ", File Length:" + (int) fi.length());
 
@@ -103,6 +103,12 @@ public class FileServer implements Runnable {
 			// TODO 发生任何错误之后，使得该端口不可用，需要在FileServerControl里面进行相关处理
 			// 目前设置为不可用，FileServerControl会尝试重启
 			FileServerControl.setFileServerStatus(port, FileServerStatus.OFF);
+		} finally {
+			try {
+				ss.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}// end run
