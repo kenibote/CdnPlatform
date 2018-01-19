@@ -3,6 +3,9 @@ package user;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import base.FileServer;
+import base.FileServerControl;
+
 public class UserMainFunction {
 	private static Logger logger = LogManager.getLogger(UserMainFunction.class.getName());
 
@@ -18,5 +21,14 @@ public class UserMainFunction {
 		UserBackTCP userbacktcp = new UserBackTCP(8091);
 		Thread t = new Thread(userbacktcp);
 		t.start();
+		
+		//-------------------实验结果下载服务-------------------------
+		FileServerControl fc = new FileServerControl();
+		new Thread(fc).start();
+		FileServer.PathPix = "E:\\";
+		
+		FileServerControl.setPort(8092, 8092);
+		FileServerControl.initFileServer();
+		FileServerControl.startFileServer();
 	}
 }

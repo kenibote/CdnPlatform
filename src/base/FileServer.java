@@ -17,6 +17,7 @@ public class FileServer implements Runnable {
 	 * 文件服务子线程，在创建该线程时候需要初始化端口号; 该子函数，首先由客户端提供一个文件名，之后向用户传递指定文件。
 	 */
 	private static Logger logger = LogManager.getLogger(FileServer.class.getName());
+	public static String PathPix = "D:\\Content\\";
 
 	private int port = 8001;
 	// 用于异步关闭线程
@@ -60,7 +61,7 @@ public class FileServer implements Runnable {
 
 				// 取得需要下载的文件名
 				dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
-				filePath = "D:\\Content\\" + dis.readUTF();
+				filePath = PathPix + dis.readUTF();
 				fi = new File(filePath);
 				logger.info("Port:" + port + ", File:" + filePath + ", File Length:" + (int) fi.length());
 

@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import base.FileDownload;
 import net.sf.json.JSONObject;
 
 @SuppressWarnings("serial")
@@ -356,7 +357,20 @@ public class MonitorWindow extends JFrame {
 		b_collectdata.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				for (int i = 1; i <= 3; i++) {
+					String back = null;
+					try {
+						back = MonitorSetting.Usually(MonitorSetting.local_server_info.get(i), 8091, "USER",
+								"TASK_013");
+						String FileName = JSONObject.fromObject(back).getString("RESULTNAME") + ".csv";
+						FileDownload fd = new FileDownload(MonitorSetting.local_server_info.get(i), 8092, FileName, 0);
+						fd.download();
 
+					} catch (Exception e1) {
+						System.out.println("Download Result Fail !!!");
+					}
+					System.out.println(back);
+				}
 			}
 		});
 
