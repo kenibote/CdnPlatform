@@ -39,7 +39,7 @@ public class LocalServerStatic implements Runnable {
 
 		// ----------------------------------------------------------------------
 		// 输出统计结果？
-		String saveFile = "D:\\Content\\" + "Statics" + ".csv";
+		String saveFile = "D:\\Content\\" + "StaticsArrivalRate" + ".csv";
 
 		try {
 			FileWriter fout = new FileWriter(saveFile);
@@ -48,6 +48,27 @@ public class LocalServerStatic implements Runnable {
 			while (it.hasNext()) {
 				int key = (int) it.next();
 				int value = LocalServerPublicSetting.total_arrival_rate.get(key);
+
+				String output = key + "," + value + ",\r\n";
+				fout.write(output);
+			}
+
+			// 关闭文件
+			fout.flush();
+			fout.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// -------------------------输出另一个统计结果----------------------------------
+		saveFile = "D:\\Content\\" + "StaticsLiveLike" + ".csv";
+		try {
+			FileWriter fout = new FileWriter(saveFile);
+
+			Iterator<String> it = LocalServerPublicSetting.content_live_like.keySet().iterator();
+			while (it.hasNext()) {
+				String key = it.next();
+				double value = LocalServerPublicSetting.content_live_like.get(key);
 
 				String output = key + "," + value + ",\r\n";
 				fout.write(output);

@@ -19,8 +19,9 @@ import net.sf.json.JSONObject;
 public class MonitorWindow extends JFrame {
 	public static JPanel panel_server, panel_original, panel_user, panel_info;
 	public static JButton b_server_set, b_server_hello, b_server_init, b_server_updatamap, b_server_static_start,
-			b_server_static_stop, b_server_start, b_server_stop, b_original_set, b_original_init, b_original_hello,
-			b_original_start, b_original_stop, b_user_set, b_user_load, b_user_start, b_user_check, b_collectdata;
+			b_server_static_stop, b_server_start, b_server_stop, b_server_init_like, b_original_set, b_original_init,
+			b_original_hello, b_original_start, b_original_stop, b_user_set, b_user_load, b_user_start, b_user_check,
+			b_collectdata;
 	public static JLabel task1, task2, task3;
 	public static JTextField[] progress = new JTextField[4];
 
@@ -39,6 +40,7 @@ public class MonitorWindow extends JFrame {
 		b_server_stop = new JButton("STOP");
 		b_server_static_start = new JButton("启动统计");
 		b_server_static_stop = new JButton("关闭统计");
+		b_server_init_like = new JButton("init like");
 
 		b_original_set = new JButton("设置原服务器");
 		b_original_hello = new JButton("HELLO");
@@ -75,6 +77,7 @@ public class MonitorWindow extends JFrame {
 		panel_server.add(b_server_init);
 		panel_server.add(b_server_start);
 		panel_server.add(b_server_stop);
+		panel_server.add(b_server_init_like);
 		panel_server.add(b_server_static_start);
 		panel_server.add(b_server_static_stop);
 
@@ -249,6 +252,21 @@ public class MonitorWindow extends JFrame {
 								"TASK_006");
 					} catch (Exception e1) {
 						System.out.println("Local Server Stop Fail !!!");
+					}
+					System.out.println(back);
+				}
+			}
+		});
+		
+		b_server_init_like.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 1; i <= 3; i++) {
+					String back = null;
+					try {
+						back = MonitorSetting.SetLocalServerLike(i);
+					} catch (Exception e1) {
+						System.out.println("Local Server Init Like Fail !!!");
 					}
 					System.out.println(back);
 				}

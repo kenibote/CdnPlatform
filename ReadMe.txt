@@ -37,6 +37,7 @@ TASK_005 ：monitor启动localServer
 TASK_006 : monitor关闭localServer
 TASK_015 : monitor启动localServer统计服务功能
 TASK_016 : monitor关闭localServer统计服务功能
+TASK_017 : monitor向localServer初始化喜欢表
 --------------------------------------------------------------------------------
 TASK_007 : monitor设置OriginalServer
 TASK_008 : originalServer初始化工作

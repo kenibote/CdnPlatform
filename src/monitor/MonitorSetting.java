@@ -7,23 +7,24 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.HashMap;
 
+import data.PopularityGenerate;
 import net.sf.json.JSONObject;
 
 public class MonitorSetting {
 
 	public static HashMap<Integer, String> local_server_info = new HashMap<>();
 	public static HashMap<Integer, String> user_server_info = new HashMap<>();
-	public static String original_server = "10.10.12.136";
+	public static String original_server = "10.70.86.124";
 	public static String monitor_ip = "10.10.12.136";
 
 	static {
-		local_server_info.put(1, "10.10.12.110");
-		local_server_info.put(2, "10.10.12.33");
-		local_server_info.put(3, "10.10.12.59");
+		local_server_info.put(1, "10.10.12.137");
+		local_server_info.put(2, "10.10.12.139");
+		local_server_info.put(3, "10.10.12.155");
 
-		user_server_info.put(1, "192.168.1.110");
-		user_server_info.put(2, "192.168.1.33");
-		user_server_info.put(3, "192.168.1.59");
+		user_server_info.put(1, "192.168.1.101");
+		user_server_info.put(2, "192.168.1.101");
+		user_server_info.put(3, "192.168.1.101");
 	}
 
 	public static String setLocalServer(int id) throws Exception {
@@ -168,6 +169,34 @@ public class MonitorSetting {
 			result.put(sp[0], sp[1]);
 		}
 		fin.close();
+
+		JSONObject json = JSONObject.fromObject(result);
+		write.println(json.toString());
+		write.flush();
+
+		String back = input.readLine();
+		socket.close();
+
+		return back;
+	}
+
+	public static String SetLocalServerLike(int id) throws Exception {
+		Socket socket = new Socket(local_server_info.get(id), 8090);
+
+		BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		PrintWriter write = new PrintWriter(socket.getOutputStream());
+
+		HashMap<String, String> result = new HashMap<>();
+		result.put("KEY", "LocalServer");
+		result.put("TYPE", "TASK_017");
+
+		result.put("ContentNumber", 300 + "");
+		PopularityGenerate.ContentNumber = 300;
+		PopularityGenerate.generateRaw(0.88);
+		for (int i = 1; i <= 300; i++) {
+			double like = PopularityGenerate.ZipfRaw.get(i);
+			result.put("C" + i, like + "");
+		}
 
 		JSONObject json = JSONObject.fromObject(result);
 		write.println(json.toString());
