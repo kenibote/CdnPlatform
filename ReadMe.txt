@@ -22,6 +22,8 @@ ERROR_004 : LOCALSERVER服务已经关闭
 --------------------------------------------------------------------------------
 ERROR_005 : OriginalServer服务已启动
 ERROR_006 : OriginalServer服务已关闭
+ERROR_007 : LocalServer统计服务已启动
+ERROR_008 : LocalServer统计服务已关闭
 
 
 TASK信息：
@@ -33,6 +35,8 @@ TASK_014 : 下发ContentMap表
 TASK_004 ：localserver初始化一些设置
 TASK_005 ：monitor启动localServer
 TASK_006 : monitor关闭localServer
+TASK_015 : monitor启动localServer统计服务功能
+TASK_016 : monitor关闭localServer统计服务功能
 --------------------------------------------------------------------------------
 TASK_007 : monitor设置OriginalServer
 TASK_008 : originalServer初始化工作

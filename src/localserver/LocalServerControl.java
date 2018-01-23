@@ -36,7 +36,7 @@ public class LocalServerControl {
 		case "TASK_003":
 			localserverSet(commandin);
 			break;
-			
+
 		case "TASK_014":
 			UpdataContentMap(commandin);
 			break;
@@ -49,6 +49,14 @@ public class LocalServerControl {
 			StartLocalServer();
 			break;
 
+		case "TASK_015":
+			StartStaticFunction();
+			break;
+
+		case "TASK_016":
+			StopStaticFunction();
+			break;
+
 		case "TASK_006":
 			StopLocalServer();
 			break;
@@ -59,17 +67,58 @@ public class LocalServerControl {
 		}
 
 	}
-	
-	
-	public static void UpdataContentMap(String commandin){
+
+	public static void StartStaticFunction() {
+		initResult("INIT");
+
+		if (!LocalServerPublicSetting.localstaticfunction) {
+			LocalServerPublicSetting.localstaticfunction = true;
+			// 最好在本地服务启动之后，再启动统计服务
+			// 在启动统计服务之前，需要进行初始化设置
+			LocalServerPublicSetting.total_arrival = 0;
+			LocalServerPublicSetting.total_arrival_rate.clear();
+			LocalServerPublicSetting.content_count.clear();
+
+			for (int i = 1; i <= (int) LocalServerPublicSetting.Content_N; i++) {
+				LocalServerPublicSetting.content_count.put("C" + i, 0);
+			}
+
+			// 最后启动服务
+			new Thread(new LocalServerStatic()).start();
+
+			result.put("CODE", "TASK_015");
+			result.put("STATE", "SUCCESS");
+		} else {
+			result.put("CODE", "ERROR_007");
+		}
+
+		initResult("SEND");
+	}
+
+	public static void StopStaticFunction() {
+		initResult("INIT");
+
+		if (LocalServerPublicSetting.localstaticfunction) {
+
+			result.put("CODE", "TASK_016");
+			result.put("STATE", "SUCCESS");
+
+			LocalServerPublicSetting.localstaticfunction = false;
+		} else {
+			result.put("CODE", "ERROR_008");
+		}
+
+		initResult("SEND");
+	}
+
+	public static void UpdataContentMap(String commandin) {
 		LocalServerPublicSetting.DoContentMap("INIT", commandin, "");
-		
+
 		initResult("INIT");
 		result.put("CODE", "TASK_014");
 		result.put("STATE", "SUCCESS");
 		initResult("SEND");
 	}
-	
 
 	public static void initLocalServer() {
 
@@ -113,9 +162,6 @@ public class LocalServerControl {
 			result.put("STATE", "SUCCESS");
 
 			LocalServerPublicSetting.localserverflag = true;
-			
-			// 必须在flag置为true之后，才可以启动统计服务
-			new Thread(new LocalServerStatic()).start();
 		} else {
 			result.put("CODE", "ERROR_3");
 		}

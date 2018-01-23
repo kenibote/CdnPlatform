@@ -1,5 +1,9 @@
 package localserver;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,10 +13,12 @@ public class LocalServerStatic implements Runnable {
 	@Override
 	public void run() {
 		logger.info("Static 线程启动！！！");
-		
+
 		int point = 0;
+		int pre = LocalServerPublicSetting.total_arrival;
+		int rate = 0;
 		// 当服务是启动的时候,当服务结束之后，该线程自动结束
-		while (LocalServerPublicSetting.localserverflag) {
+		while (LocalServerPublicSetting.localstaticfunction) {
 
 			// 休息指定间隔
 			try {
@@ -21,13 +27,38 @@ public class LocalServerStatic implements Runnable {
 				e.printStackTrace();
 			}
 
+			// 统计该本地端到达率
 			point++;
-			// 统计该本地端总到达率
-			LocalServerPublicSetting.total_arrival_rate.put(point, LocalServerPublicSetting.total_arrival);
+			rate = LocalServerPublicSetting.total_arrival - pre;
+			pre = LocalServerPublicSetting.total_arrival;
+			LocalServerPublicSetting.total_arrival_rate.put(point, rate);
 
 		} // end of while
 
 		logger.info("Static 线程结束！！！");
+
+		// ----------------------------------------------------------------------
+		// 输出统计结果？
+		String saveFile = "D:\\Content\\" + "Statics" + ".csv";
+
+		try {
+			FileWriter fout = new FileWriter(saveFile);
+
+			Iterator<Integer> it = LocalServerPublicSetting.total_arrival_rate.keySet().iterator();
+			while (it.hasNext()) {
+				int key = (int) it.next();
+				int value = LocalServerPublicSetting.total_arrival_rate.get(key);
+
+				String output = key + "," + value + ",\r\n";
+				fout.write(output);
+			}
+
+			// 关闭文件
+			fout.flush();
+			fout.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 	}
 

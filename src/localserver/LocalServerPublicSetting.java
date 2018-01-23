@@ -39,6 +39,7 @@ public class LocalServerPublicSetting {
 	public static boolean localserverflag = false;
 
 	// ------------到达率统计相关---------------
+	public static boolean localstaticfunction = false;
 	public static int time_period = 1000;
 	// 用于记录总请求数
 	public static int total_arrival = 0;

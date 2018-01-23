@@ -18,9 +18,9 @@ import net.sf.json.JSONObject;
 @SuppressWarnings("serial")
 public class MonitorWindow extends JFrame {
 	public static JPanel panel_server, panel_original, panel_user, panel_info;
-	public static JButton b_server_set, b_server_hello, b_server_init, b_server_updatamap, b_server_start,
-			b_server_stop, b_original_set, b_original_init, b_original_hello, b_original_start, b_original_stop,
-			b_user_set, b_user_load, b_user_start, b_user_check, b_collectdata;
+	public static JButton b_server_set, b_server_hello, b_server_init, b_server_updatamap, b_server_static_start,
+			b_server_static_stop, b_server_start, b_server_stop, b_original_set, b_original_init, b_original_hello,
+			b_original_start, b_original_stop, b_user_set, b_user_load, b_user_start, b_user_check, b_collectdata;
 	public static JLabel task1, task2, task3;
 	public static JTextField[] progress = new JTextField[4];
 
@@ -37,6 +37,8 @@ public class MonitorWindow extends JFrame {
 		b_server_init = new JButton("初始化");
 		b_server_start = new JButton("启动");
 		b_server_stop = new JButton("STOP");
+		b_server_static_start = new JButton("启动统计");
+		b_server_static_stop = new JButton("关闭统计");
 
 		b_original_set = new JButton("设置原服务器");
 		b_original_hello = new JButton("HELLO");
@@ -73,6 +75,8 @@ public class MonitorWindow extends JFrame {
 		panel_server.add(b_server_init);
 		panel_server.add(b_server_start);
 		panel_server.add(b_server_stop);
+		panel_server.add(b_server_static_start);
+		panel_server.add(b_server_static_stop);
 
 		panel_original.add(b_original_set);
 		panel_original.add(b_original_hello);
@@ -104,7 +108,7 @@ public class MonitorWindow extends JFrame {
 
 		// 设置窗体
 		this.setTitle("Super Monitor -- WangNing");// 窗体标签
-		this.setSize(600, 160);// 窗体大小
+		this.setSize(900, 165);// 窗体大小
 		this.setLocationRelativeTo(null);// 在屏幕中间显示(居中显示)
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);// 退出关闭JFrame
 		this.setVisible(true);// 显示窗体
@@ -181,6 +185,38 @@ public class MonitorWindow extends JFrame {
 								"TASK_004");
 					} catch (Exception e1) {
 						System.out.println("Local Server Init Fail !!!");
+					}
+					System.out.println(back);
+				}
+			}
+		});
+
+		b_server_static_start.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 1; i <= 3; i++) {
+					String back = null;
+					try {
+						back = MonitorSetting.Usually(MonitorSetting.local_server_info.get(i), 8090, "LocalServer",
+								"TASK_015");
+					} catch (Exception e1) {
+						System.out.println("Local Server Static Start Fail !!!");
+					}
+					System.out.println(back);
+				}
+			}
+		});
+
+		b_server_static_stop.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				for (int i = 1; i <= 3; i++) {
+					String back = null;
+					try {
+						back = MonitorSetting.Usually(MonitorSetting.local_server_info.get(i), 8090, "LocalServer",
+								"TASK_016");
+					} catch (Exception e1) {
+						System.out.println("Local Server Static Stop Fail !!!");
 					}
 					System.out.println(back);
 				}

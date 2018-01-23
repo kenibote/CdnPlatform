@@ -62,6 +62,28 @@ public class LoadBalanceServer implements Runnable {
 
 	}
 
+	// 统计服务功能
+	public static void Static(String id) {
+		// 总计数器加1
+		LocalServerPublicSetting.total_arrival++;
+
+		// 每个内容的计数器加1
+		int add1 = LocalServerPublicSetting.content_count.get(id) + 1;
+		LocalServerPublicSetting.content_count.put(id, add1);
+		
+		// 对每一个内容执行sanjay操作 (已经优化)
+		double like_log = LocalServerPublicSetting.content_live_like.get(id);
+		like_log = (like_log * LocalServerPublicSetting.Content_N + 1)
+				/ (LocalServerPublicSetting.Content_N + 1);
+		for (String key : LocalServerPublicSetting.content_live_like.keySet()) {
+			double like = LocalServerPublicSetting.content_live_like.get(key);
+			like = (like * LocalServerPublicSetting.Content_N) / (LocalServerPublicSetting.Content_N + 1);
+			LocalServerPublicSetting.content_live_like.put(key, like);
+		}
+		// 对指定内容执行另一个sanjay操作
+		LocalServerPublicSetting.content_live_like.put(id, like_log);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
@@ -95,8 +117,10 @@ public class LoadBalanceServer implements Runnable {
 					// 获取ID
 					String id = (String) JSONObject.fromObject(getCommand).getOrDefault("ID", "NULL");
 
-					// 统计到达率
-					LocalServerPublicSetting.total_arrival++;
+					// 如果开启了统计服务功能
+					if (LocalServerPublicSetting.localstaticfunction) {
+						Static(id);
+					}
 
 					// 由该函数查找指定服务器
 					findServer(id);
