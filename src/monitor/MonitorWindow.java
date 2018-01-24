@@ -20,8 +20,8 @@ public class MonitorWindow extends JFrame {
 	public static JPanel panel_server, panel_original, panel_user, panel_info;
 	public static JButton b_server_set, b_server_hello, b_server_init, b_server_updatamap, b_server_static_start,
 			b_server_static_stop, b_server_start, b_server_stop, b_server_init_like, b_original_set, b_original_init,
-			b_original_hello, b_original_start, b_original_stop, b_user_set, b_user_load, b_user_start, b_user_check,
-			b_collectdata;
+			b_original_hello, b_original_start, b_original_stop, b_original_remap, b_original_remap_stop, b_user_set,
+			b_user_load, b_user_start, b_user_check, b_collectdata;
 	public static JLabel task1, task2, task3;
 	public static JTextField[] progress = new JTextField[4];
 
@@ -47,6 +47,8 @@ public class MonitorWindow extends JFrame {
 		b_original_init = new JButton("初始化");
 		b_original_start = new JButton("启动");
 		b_original_stop = new JButton("STOP");
+		b_original_remap = new JButton("ReMapStart");
+		b_original_remap_stop = new JButton("ReMapStop");
 
 		b_user_set = new JButton("设置用户仿真");
 		b_user_load = new JButton("读取TASK");
@@ -86,6 +88,8 @@ public class MonitorWindow extends JFrame {
 		panel_original.add(b_original_init);
 		panel_original.add(b_original_start);
 		panel_original.add(b_original_stop);
+		panel_original.add(b_original_remap);
+		panel_original.add(b_original_remap_stop);
 
 		panel_user.add(b_user_set);
 		panel_user.add(b_user_load);
@@ -257,7 +261,7 @@ public class MonitorWindow extends JFrame {
 				}
 			}
 		});
-		
+
 		b_server_init_like.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -339,6 +343,20 @@ public class MonitorWindow extends JFrame {
 			}
 		});
 
+		b_original_remap.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MonitorSetting.StartReMapServer("Start");
+			}
+		});
+
+		b_original_remap_stop.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MonitorSetting.StartReMapServer("Stop");
+			}
+		});
+
 		// ----------------------------------------------------------------
 		b_user_set.addActionListener(new ActionListener() {
 			@Override
@@ -383,6 +401,9 @@ public class MonitorWindow extends JFrame {
 					}
 					System.out.println(back);
 				}
+
+				// 以后此处可以顺带启动ReMap服务
+				// MonitorSetting.StartReMapServer("Start");
 			}
 		});
 

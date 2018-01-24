@@ -208,4 +208,15 @@ public class MonitorSetting {
 		return back;
 	}
 
+	public static void StartReMapServer(String gowhere) {
+		if ("Start".endsWith(gowhere)) {
+			ReMapServer.flag = true;
+			new Thread(new ReMapServer()).start();
+		}
+
+		if ("Stop".equals(gowhere)) {
+			ReMapServer.flag = false;
+		}
+	}
+
 }

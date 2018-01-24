@@ -10,6 +10,8 @@ public class MonitorServer {
 		FileServerControl.setPort(8095, 8096);
 		FileServerControl.initFileServer();
 		FileServerControl.startFileServer();
+		
+		new MonitorWindow();
 	}
 
 }
