@@ -92,19 +92,19 @@ public class LocalServerControl {
 
 	public static void initLike(String commandin) {
 		initResult("INIT");
-		
+
 		json = JSONObject.fromObject(commandin);
-		
+
 		int ContentNumber = json.getInt("ContentNumber");
-		LocalServerPublicSetting.Content_N = (double)ContentNumber;
-		
+		LocalServerPublicSetting.Content_N = (double) ContentNumber;
+
 		// 先清理所有数据，之后重新赋值
 		LocalServerPublicSetting.content_live_like.clear();
-		for(int i=1;i<=ContentNumber;i++){
-			double like = json.getDouble("C"+i);
-			LocalServerPublicSetting.content_live_like.put("C"+i, like);
+		for (int i = 1; i <= ContentNumber; i++) {
+			double like = json.getDouble("C" + i);
+			LocalServerPublicSetting.content_live_like.put("C" + i, like);
 		}
-		
+
 		result.put("CODE", "TASK_017");
 		result.put("STATE", "SUCCESS");
 		initResult("SEND");

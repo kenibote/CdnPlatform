@@ -72,8 +72,7 @@ public class LoadBalanceServer implements Runnable {
 
 		// 对每一个内容执行sanjay操作 (已经优化)
 		double like_log = LocalServerPublicSetting.content_live_like.get(id);
-		like_log = (like_log * LocalServerPublicSetting.Content_N + 1)
-				/ (LocalServerPublicSetting.Content_N + 1);
+		like_log = (like_log * LocalServerPublicSetting.Content_N + 1) / (LocalServerPublicSetting.Content_N + 1);
 		for (String key : LocalServerPublicSetting.content_live_like.keySet()) {
 			double like = LocalServerPublicSetting.content_live_like.get(key);
 			like = (like * LocalServerPublicSetting.Content_N) / (LocalServerPublicSetting.Content_N + 1);

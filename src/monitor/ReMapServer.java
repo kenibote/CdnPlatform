@@ -7,14 +7,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.sf.json.JSONObject;
+
 public class ReMapServer implements Runnable {
 
 	private static Logger logger = LogManager.getLogger(ReMapServer.class.getName());
 
 	public static long autoReMapTime = 60_000;
 	public static boolean flag = false;
-	
-	
 	private static JSONObject json = null;
 
 	public static HashMap<String, Double> arrival_rate = new HashMap<>();
@@ -25,14 +24,13 @@ public class ReMapServer implements Runnable {
 		logger.info("ReMap 启动");
 
 		// TODO 初始化载入历史数据
+
 		while (flag) {
 			try {
 				Thread.sleep(autoReMapTime);
 				// 回收点击率信息+到达率信息
 				// 整合之后发给AI模块
 				// ReMap操作
-				
-				
 				getInfoFromLocalServer();
 
 			} catch (InterruptedException e) {
