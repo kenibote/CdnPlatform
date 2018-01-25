@@ -88,4 +88,22 @@ public class LocalServerPublicSetting {
 
 		return false;
 	}
+
+	public synchronized static void DoContentCount(String gowhere, String id, HashMap<String, String> result) {
+		if ("ADD".equals(gowhere)) {
+			int add1 = content_count.get(id) + 1;
+			content_count.put(id, add1);
+		}
+
+		if ("RESULT".equals(gowhere)) {
+			int count = (int) Content_N;
+			// 依次取出所有数据到result中，并设置0
+			for (int c = 1; c <= count; c++) {
+				result.put("C" + c, content_count.get("C" + c) + "");
+				content_count.put("C" + c, 0);
+			}
+
+		}
+
+	}
 }

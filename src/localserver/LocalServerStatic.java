@@ -9,6 +9,19 @@ import org.apache.logging.log4j.Logger;
 
 public class LocalServerStatic implements Runnable {
 	private static Logger logger = LogManager.getLogger(LocalServerStatic.class.getName());
+	private static int time_flag = 0;
+
+	public static double Average_ArrivalRate() {
+		int now = LocalServerPublicSetting.total_arrival_rate.size();
+		double sum = 0;
+		for (int i = time_flag; i <= now; i++) {
+			sum = sum + LocalServerPublicSetting.total_arrival_rate.get(i);
+		}
+		sum = sum / (now - time_flag);
+		time_flag = now;
+
+		return sum;
+	}
 
 	@Override
 	public void run() {

@@ -65,11 +65,29 @@ public class LocalServerControl {
 			StopLocalServer();
 			break;
 
+		case "TASK_018":
+			requestCount();
+			break;
+
 		// 如果没有匹配到任何task
 		default:
 			Default();
 		}
 
+	}
+
+	public static void requestCount() {
+		initResult("INIT");
+
+		// TODO 补充计算到达率的方法
+		double rate = LocalServerStatic.Average_ArrivalRate();
+		result.put("ArrivalRate", rate + "");
+		result.put("ContentNumber", LocalServerPublicSetting.Content_N + "");
+		LocalServerPublicSetting.DoContentCount("RESULT", null, result);
+
+		result.put("CODE", "TASK_018");
+		result.put("STATE", "SUCCESS");
+		initResult("SEND");
 	}
 
 	public static void initLike(String commandin) {

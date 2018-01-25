@@ -68,9 +68,8 @@ public class LoadBalanceServer implements Runnable {
 		LocalServerPublicSetting.total_arrival++;
 
 		// 每个内容的计数器加1
-		int add1 = LocalServerPublicSetting.content_count.get(id) + 1;
-		LocalServerPublicSetting.content_count.put(id, add1);
-		
+		LocalServerPublicSetting.DoContentCount("ADD", id, null);
+
 		// 对每一个内容执行sanjay操作 (已经优化)
 		double like_log = LocalServerPublicSetting.content_live_like.get(id);
 		like_log = (like_log * LocalServerPublicSetting.Content_N + 1)
