@@ -14,7 +14,7 @@ public class MonitorSetting {
 
 	public static HashMap<Integer, String> local_server_info = new HashMap<>();
 	public static HashMap<Integer, String> user_server_info = new HashMap<>();
-	public static String original_server = "10.70.86.124";
+	public static String original_server = "10.10.12.136";
 	public static String monitor_ip = "10.10.12.136";
 
 	static {

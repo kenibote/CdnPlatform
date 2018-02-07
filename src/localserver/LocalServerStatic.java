@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 public class LocalServerStatic implements Runnable {
 	private static Logger logger = LogManager.getLogger(LocalServerStatic.class.getName());
-	private static int time_flag = 0;
+	private static int time_flag = 1;
 
 	public static double Average_ArrivalRate() {
 		int now = LocalServerPublicSetting.total_arrival_rate.size();

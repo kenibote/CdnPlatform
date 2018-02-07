@@ -391,6 +391,9 @@ public class MonitorWindow extends JFrame {
 		b_user_start.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// 以后此处可以顺带先启动统计功能
+				// ………………………………………………
+				
 				for (int i = 1; i <= 3; i++) {
 					String back = null;
 					try {
