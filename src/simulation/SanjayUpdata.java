@@ -108,7 +108,7 @@ public class SanjayUpdata {
 			String content = Popularity_Point.tailMap(point, true).firstEntry().getValue();
 			// 更新task id
 
-			// 更新喜好程度
+			// 更新喜好程度  5000-->0.004    1000-->0.01
 			double up = History_like.get(content);
 			up = (up * 5000 + 0.003) / 5000.003;
 
