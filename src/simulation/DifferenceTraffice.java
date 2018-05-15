@@ -5,27 +5,31 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.*;
 
+import javax.swing.text.html.HTML;
+
 public class DifferenceTraffice {
 	public static HashMap<String, Double> Content_like = new HashMap<>();
 	public static TreeMap<Double, String> like_point = new TreeMap<>();
-	public static HashMap<String, HashSet<String>> ContentMap = new HashMap<>();
-	public static HashMap<String, Double> pressure = new HashMap<>();
-
 	public static double sum = 0;
+
 	public static HashMap<String, Double> speed = new HashMap<>();
 	public static TreeMap<Double, SimulationTask> time_line = new TreeMap<>();
 	public static ArrayList<SimulationTask> history = new ArrayList<>();
-	public static int MaxCapacity = 35;
+	public static int MaxCapacity = 80;
 	public static HashMap<String, Integer> now_capacity = new HashMap<>();
+	
+	public static HashMap<String, HashSet<String>> ContentMap = new HashMap<>();
+	public static HashMap<String, Double> pressure = new HashMap<>();
 
 	public static double sim_pre_zone1 = 0.0;
 	public static double sim_pre_zone2 = 0.0;
 	public static double sim_pre_zone3 = 0.0;
 	public static double average_delay = 0;
+	static double L1=2.0,L2=7.5,L3=17.5;
 	
 	static {
-		speed.put("Zone1", 10.0);
-		speed.put("Zone2", 40.0);
+		speed.put("Zone1", 25.0);
+		speed.put("Zone2", 25.0);
 		speed.put("Zone3", 10.0);
 
 		now_capacity.put("Zone1", MaxCapacity);
@@ -94,7 +98,7 @@ public class DifferenceTraffice {
 	public static void LoadZipfRank(){
 		System.out.println("正在导入喜好程度数据！");
 
-		for (int i = 1; i <= 10000; i++) {
+		for (int i = 1; i <= 1000; i++) {
 			
 			double val = 100/(Math.pow(i, 0.88));
 
@@ -115,6 +119,7 @@ public class DifferenceTraffice {
 		// 设置随机数种子
 		randomfunction rndfunction = new randomfunction();
 		Random rnd_time = new Random(seed);
+		Random rnd_content = new Random(2*seed);
 		int ID = 0;
 
 		while (start_time < end_time) {
@@ -127,7 +132,7 @@ public class DifferenceTraffice {
 			task.TaskFrom = zone;
 			ID++;
 			task.TaskID = ID;
-			task.TaskContnet = like_point.ceilingEntry(Math.random() * sum).getValue();
+			task.TaskContnet = like_point.ceilingEntry(rnd_content.nextDouble() * sum).getValue();
 			task.TaskStartTime = start_time;
 
 			if (time_line.put(start_time, task) != null) {
@@ -160,7 +165,7 @@ public class DifferenceTraffice {
 					SimulationTask release = new SimulationTask();
 					release.TaskType = SimulationTask.Release;
 					release.TaskFrom = task.TaskFrom;
-					release.TaskStartTime = task.TaskStartTime + 1.0;
+					release.TaskStartTime = task.TaskStartTime + L1;
 					time_line.put(release.TaskStartTime, release);
 
 					continue;
@@ -179,7 +184,7 @@ public class DifferenceTraffice {
 					SimulationTask release = new SimulationTask();
 					release.TaskType = SimulationTask.Release;
 					release.TaskFrom = server;
-					release.TaskStartTime = task.TaskStartTime + 2.0;
+					release.TaskStartTime = task.TaskStartTime + L2;
 					time_line.put(release.TaskStartTime, release);
 
 					continue;
@@ -238,7 +243,7 @@ public class DifferenceTraffice {
 			
 			if(task.TaskFrom.equals(task.TaskServer)){
 				double val = sum_delay.get(task.TaskFrom);
-				val=val+1.0;
+				val=val+L1;
 				sum_delay.put(task.TaskFrom,val);
 				
 				continue;
@@ -246,14 +251,14 @@ public class DifferenceTraffice {
 			
 			if(task.TaskServer.equals("Original")){
 				double val = sum_delay.get(task.TaskFrom);
-				val=val+4.0;
+				val=val+L3;
 				sum_delay.put(task.TaskFrom,val);
 				
 				continue;
 			}
 			
 			double val = sum_delay.get(task.TaskFrom);
-			val=val+2.0;
+			val=val+L2;
 			sum_delay.put(task.TaskFrom,val);
 			
 		}
@@ -302,7 +307,7 @@ public class DifferenceTraffice {
 				zone.add(content_rank.get(j));
 				sum = sum + Content_like.get(content_rank.get(j));
 			}
-			pressure.put("Zone" + i, sum*speed.get("Zone"+i));
+			pressure.put("Zone" + i, sum*speed.get("Zone"+i)*2.9);
 		}
 		
 		int point = Math.max(Math.max(partone[1], partone[2]),partone[3]);
@@ -311,7 +316,7 @@ public class DifferenceTraffice {
 			ContentMap.get(target).add(content_rank.get(point));
 			double pre = pressure.get(target);
 			pre = pre + Content_like.get(content_rank.get(point)) * 
-					(speed.get("Zone1")*2+speed.get("Zone2")*2+speed.get("Zone3")*2-speed.get(target));
+					(speed.get("Zone1")*4.2+speed.get("Zone2")*4.2+speed.get("Zone3")*4.2-speed.get(target)*1.3);
 			pressure.put(target, pre);
 
 			point++;			
@@ -356,9 +361,16 @@ public class DifferenceTraffice {
 		}
 		
 	}
+	
+	//-----------------------------------------------------------
+	
+	
 
 	
-	public static void loop(int x,int y) throws Exception{
+	public static void loop(int x,int y,int z) throws Exception{
+		MaxCapacity = 120;
+		HPTest.Capacity = 120;
+		
 		init();
 		
 		// 载入喜好程度信息
@@ -369,8 +381,22 @@ public class DifferenceTraffice {
 		Generate_task("Zone2", 2, 21600);
 		Generate_task("Zone3", 3, 21600);
 		addpressuremonitor(21600);
+		
+		
 		// 生成Map
-		generateMap(new int[]{0,x,y,x},1000);
+		//generateMap(new int[]{0,x,y,z},100);
+		
+		HPTest.add_rate = 3;//1.6;
+		HPTest.callMap();
+		ContentMap.put("Zone1", HPTest.Map.get("ZONE1"));
+		ContentMap.put("Zone2", HPTest.Map.get("ZONE2"));
+		ContentMap.put("Zone3", HPTest.Map.get("ZONE3"));
+//		
+//		Htest.LoadZipfRank();
+//		Htest.CalMap();
+//		ContentMap.put("Zone1", Htest.Map.get("ZONE1"));
+//		ContentMap.put("Zone2", Htest.Map.get("ZONE2"));
+//		ContentMap.put("Zone3", Htest.Map.get("ZONE3"));
 		
 		// 执行仿真
 		doSimulation();
@@ -382,18 +408,29 @@ public class DifferenceTraffice {
 	
 	
 	public static void main(String[] args) throws Exception {
-		FileWriter fout = new FileWriter("D:\\different_zipf_10_40_10_35_1000.csv");
 		
-		for(int x=8;x<=36;x++){
-			for(int y=8;y<=36;y++){
-				loop(x*25,y*25);
-				fout.write(average_delay+",");
-				fout.flush();
-			}
-			fout.write("\n");
-		}
+		//loop(20,100); //500 capacity
+		//loop(26,100); //100 capacity
+		//loop(32,52);  //80 capacity
+		//loop(32,32);  //70 capacity
+		//loop(28,28);  //60 capacity
+		loop(36,36,16);
 		
-		fout.close();
 		
+//		FileWriter fout = new FileWriter("D:\\different_zipf_25_25_10_120_100.csv");
+//		
+//		for(int x=10;x<=80;x+=5){
+//			for(int y=10;y<=80;y+=5){
+//				for(int z=10;z<=80;z+=5){
+//					loop(y,y,x);
+//					fout.write(average_delay+",");
+//					fout.flush();
+//					fout.write("\n");
+//				}				
+//			}
+//		}
+//		
+//		fout.close();
+//		
 	}
 }
