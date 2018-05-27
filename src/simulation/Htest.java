@@ -7,7 +7,7 @@ public class Htest {
 	static int TOTAL_ZONE = 3;
 	static int ZONE_SPACE = 100;
 
-	static double H1 = 40, H2 = 10, H3 = 10;
+	static double H1 = 40, H2 = 20, H3 = 10;
 	static double L1 = 2.0, L2 = 7.5, L3 = 17.5;
 	static HashMap<String, Double> ZIPF = new HashMap<>();
 	static HashMap<String, HashSet<String>> Map = new HashMap<>();
@@ -68,6 +68,8 @@ public class Htest {
 
 		while (true) {
 
+			System.out.println("--Point:"+point+" b="+b+", c="+c+"--");
+			
 			double v1 = 0, v2 = 0, v3 = 0;
 
 			v1 = H1 * ZIPF.get("C" + point) * L1 + (H2 + H3) * ZIPF.get("C" + point) * L2 + H2 * ZIPF.get("C" + b) * L1

@@ -5,7 +5,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.*;
 
-import javax.swing.text.html.HTML;
 
 public class DifferenceTraffice {
 	public static HashMap<String, Double> Content_like = new HashMap<>();
@@ -28,8 +27,8 @@ public class DifferenceTraffice {
 	static double L1=2.0,L2=7.5,L3=17.5;
 	
 	static {
-		speed.put("Zone1", 25.0);
-		speed.put("Zone2", 25.0);
+		speed.put("Zone1", 40.0);
+		speed.put("Zone2", 20.0);
 		speed.put("Zone3", 10.0);
 
 		now_capacity.put("Zone1", MaxCapacity);
@@ -365,11 +364,65 @@ public class DifferenceTraffice {
 	//-----------------------------------------------------------
 	
 	
+	public static void LoadMap() throws Exception{
+		BufferedReader br = new BufferedReader(new FileReader("D:\\JavaWorkSpace\\CdnPlatform\\ampl\\40_20_10_c100.txt"));
+		
+		String in = null;
+		while((in = br.readLine())!=null){
+			String[] sp = in.split("\\s+");
+			int point = Integer.parseInt(sp[0].substring(1));
+			
+			if(sp[1].equals("1")){
+				ContentMap.get("Zone1").add("C"+point);
+			}
+			
+			if(sp[2].equals("1")){
+				ContentMap.get("Zone2").add("C"+point);
+			}
+			
+			if(sp[3].equals("1")){
+				ContentMap.get("Zone3").add("C"+point);
+			}
+		}
+	
+		br.close();
+	}
+	
+	
+	public static void showMap(){
+		HashMap<String,TreeSet<Integer>> show = new HashMap<>();
+		show.put("Zone1", new TreeSet<Integer>());
+		show.put("Zone2", new TreeSet<Integer>());
+		show.put("Zone3", new TreeSet<Integer>());
+		
+		for(int i=1;i<=3;i++){
+			HashSet<String> zoneC = ContentMap.get("Zone"+i);
+			TreeSet<Integer> zoneShow = show.get("Zone"+i);
+			
+			for(String e:zoneC){
+				zoneShow.add(Integer.parseInt(e.substring(1)));
+			}
+		}
+		
+		System.out.println("-------MapShow------");
+		Iterator<Integer> it1 = show.get("Zone1").iterator();
+		Iterator<Integer> it2 = show.get("Zone2").iterator();
+		Iterator<Integer> it3 = show.get("Zone3").iterator();
+		
+		while(it1.hasNext()){
+			System.out.print(it1.next()+"  ");
+			System.out.print(it2.next()+"  ");
+			System.out.print(it3.next()+"  ");
+			
+			System.out.println("");
+		}
+		
+	}
 
 	
 	public static void loop(int x,int y,int z) throws Exception{
-		MaxCapacity = 120;
-		HPTest.Capacity = 120;
+		MaxCapacity = 150;
+		HPTest.Capacity = 150;
 		
 		init();
 		
@@ -385,18 +438,21 @@ public class DifferenceTraffice {
 		
 		// 生成Map
 		//generateMap(new int[]{0,x,y,z},100);
+
+//		LoadMap();
 		
-		HPTest.add_rate = 3;//1.6;
-		HPTest.callMap();
-		ContentMap.put("Zone1", HPTest.Map.get("ZONE1"));
-		ContentMap.put("Zone2", HPTest.Map.get("ZONE2"));
-		ContentMap.put("Zone3", HPTest.Map.get("ZONE3"));
-//		
-//		Htest.LoadZipfRank();
-//		Htest.CalMap();
-//		ContentMap.put("Zone1", Htest.Map.get("ZONE1"));
-//		ContentMap.put("Zone2", Htest.Map.get("ZONE2"));
-//		ContentMap.put("Zone3", Htest.Map.get("ZONE3"));
+//		HPTest.add_rate = 2.0;//1.6;
+//		HPTest.callMap();
+//		HPTest.showMap();
+//		ContentMap.put("Zone1", HPTest.Map.get("ZONE1"));
+//		ContentMap.put("Zone2", HPTest.Map.get("ZONE2"));
+//		ContentMap.put("Zone3", HPTest.Map.get("ZONE3"));
+		
+		Htest.LoadZipfRank();
+		Htest.CalMap();
+		ContentMap.put("Zone1", Htest.Map.get("ZONE1"));
+		ContentMap.put("Zone2", Htest.Map.get("ZONE2"));
+		ContentMap.put("Zone3", Htest.Map.get("ZONE3"));
 		
 		// 执行仿真
 		doSimulation();
@@ -416,21 +472,24 @@ public class DifferenceTraffice {
 		//loop(28,28);  //60 capacity
 		loop(36,36,16);
 		
+		//LoadMap();
+		//showMap();
 		
-//		FileWriter fout = new FileWriter("D:\\different_zipf_25_25_10_120_100.csv");
+		
+//		FileWriter fout = new FileWriter("D:\\different_zipf_40_10_10_60_100.csv");
 //		
-//		for(int x=10;x<=80;x+=5){
-//			for(int y=10;y<=80;y+=5){
-//				for(int z=10;z<=80;z+=5){
+//		for(int x=10;x<=100;x+=2){
+//			for(int y=10;y<=100;y+=2){
+//				for(int z=10;z<=100;z+=2){
 //					loop(y,y,x);
 //					fout.write(average_delay+",");
 //					fout.flush();
-//					fout.write("\n");
 //				}				
+//				fout.write("\n");
 //			}
 //		}
 //		
 //		fout.close();
-//		
+		
 	}
 }

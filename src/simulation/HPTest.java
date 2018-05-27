@@ -11,7 +11,7 @@ public class HPTest {
 	//3个等级的 业务响应时间
 	static double L1 = 2.0, L2 = 7.5, L3 = 17.5;
 	//服务器负载权重 ， 之后add_rate可以考虑使用非线性函数！！！
-	static double w1 = 1.0, w2 = 4.0, w3 = 4.0 , alpha = 1, add_rate = 1.0;
+	static double w1 = 1.0, w2 = 2.0, w3 = 4.0 , alpha = 1, add_rate = 1.0;
 	//预估压力
 	static double PRESSURE1,PRESSURE2,PRESSURE3;
 	
@@ -21,7 +21,7 @@ public class HPTest {
 
 	static {
 		Arrival_Rate.put("ZONE1", 40.0);
-		Arrival_Rate.put("ZONE2", 10.0);
+		Arrival_Rate.put("ZONE2", 20.0);
 		Arrival_Rate.put("ZONE3", 10.0);
 	}
 
@@ -302,20 +302,23 @@ public class HPTest {
 			// 每循环一次结束后，point--
 			point--;
 			
+			
 			// TODO 记得删掉 测试代码 压力平衡
-			if(Capacity-PRESSURE1 < PRESSURE1/2.5){
-				System.out.println("压力平衡导致退出");
-				return;
+			int pre_out = 0;
+			if(PRESSURE1/Capacity > 0.7){  //Capacity-PRESSURE1 < PRESSURE1/4
+				pre_out++;
 			}
-			if(Capacity-PRESSURE2 < PRESSURE2/2.5){
-				System.out.println("压力平衡导致退出");
-				return;
+			if(PRESSURE2/Capacity > 0.7){
+				pre_out++;
 			}
-			if(Capacity-PRESSURE3 < PRESSURE3/2.5){
-				System.out.println("压力平衡导致退出");
-				return;
+			if(PRESSURE3/Capacity > 0.7){
+				pre_out++;
 			}
 			
+			if(pre_out>=2){
+				System.out.println("压力平衡导致退出");
+				return;
+			}
 			
 //			double average = (PRESSURE1 + PRESSURE2 + PRESSURE3)/3;
 //			double fangcha = Math.pow(PRESSURE1-average,2) + Math.pow(PRESSURE2-average,2) + Math.pow(PRESSURE3-average,2);
