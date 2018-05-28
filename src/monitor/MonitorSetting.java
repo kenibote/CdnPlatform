@@ -14,13 +14,14 @@ public class MonitorSetting {
 
 	public static HashMap<Integer, String> local_server_info = new HashMap<>();
 	public static HashMap<Integer, String> user_server_info = new HashMap<>();
-	public static String original_server = "10.10.12.136";
-	public static String monitor_ip = "10.10.12.136";
+	public static String FileSize = "1";
+	public static String original_server = "172.19.13.202";
+	public static String monitor_ip = "10.10.12.83";
 
 	static {
-		local_server_info.put(1, "10.10.12.137");
-		local_server_info.put(2, "10.10.12.139");
-		local_server_info.put(3, "10.10.12.155");
+		local_server_info.put(1, "10.10.12.26");
+		local_server_info.put(2, "10.10.12.101");
+		local_server_info.put(3, "10.10.12.134");
 
 		user_server_info.put(1, "192.168.1.101");
 		user_server_info.put(2, "192.168.1.101");
@@ -41,6 +42,7 @@ public class MonitorSetting {
 		result.put("LoadBalancePort", "8070");
 		result.put("StartPort", "8001");
 		result.put("EndPort", "8020");
+		result.put("FileSize", FileSize);
 		result.put("LocalServerNumber", "3");
 		result.put("Neighbor1", local_server_info.get(1));
 		result.put("Neighbor2", local_server_info.get(2));
@@ -70,6 +72,7 @@ public class MonitorSetting {
 		result.put("RemoteBalancePort", "8071");
 		result.put("StartPort", "8001");
 		result.put("EndPort", "8050");
+		result.put("FileSize", FileSize);
 		result.put("LocalServerNumber", "3");
 		result.put("Neighbor1", local_server_info.get(1));
 		result.put("Neighbor2", local_server_info.get(2));

@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import base.FileServerControl;
+import base.FileServer;
 import net.sf.json.JSONObject;
 
 public class OriginalServerControl {
@@ -125,7 +126,12 @@ public class OriginalServerControl {
 		// 服务能力（起始与终止端口）
 		OriginalServerPublicSetting.Start_port = Integer.parseInt((String) json.getOrDefault("StartPort", "0"));
 		OriginalServerPublicSetting.End_port = Integer.parseInt((String) json.getOrDefault("EndPort", "0"));
-
+		FileServer.FileSize = Integer.parseInt((String) json.getOrDefault("FileSize", "0"));
+		if(FileServer.FileSize>0)
+			FileServer.DownloadModel="Image";
+		else
+			FileServer.DownloadModel="Real";
+		
 		// 记录邻居信息
 		int neighbor_number = Integer.parseInt((String) json.getOrDefault("LocalServerNumber", "0"));
 		OriginalServerPublicSetting.Neighbor.clear();

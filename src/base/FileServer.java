@@ -20,6 +20,8 @@ public class FileServer implements Runnable {
 	public static String PathPix = "D:\\Content\\";
 
 	private int port = 8001;
+	public static int FileSize = -1;
+	public static String DownloadModel = "Real";
 	// 用于异步关闭线程
 	private ServerSocket ss = null;
 
@@ -55,48 +57,89 @@ public class FileServer implements Runnable {
 			FileServerControl.setFileServerStatus(port, FileServerStatus.AVAILABLE);
 
 			while (true) {
-				// 建立socket链接
-				s = ss.accept();
-				logger.info("Port:" + port + ", Build Socket Link...");
+				if ("Real".equals(DownloadModel)) {
 
-				// 取得需要下载的文件名
-				dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
-				filePath = PathPix + dis.readUTF();
-				fi = new File(filePath);
-				logger.info("Port:" + port + ", File:" + filePath + ", File Length:" + (int) fi.length());
+					// 建立socket链接
+					s = ss.accept();
+					logger.info("Port:" + port + ", Build Socket Link...");
 
-				// 获得文件输入流，socket输出流
-				fis = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath)));
-				ps = new DataOutputStream(s.getOutputStream());
+					// 取得需要下载的文件名
+					dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+					filePath = PathPix + dis.readUTF();
+					fi = new File(filePath);
+					logger.info("Port:" + port + ", File:" + filePath + ", File Length:" + (int) fi.length());
 
-				// 传送文件
-				ps.writeUTF(fi.getName());
-				ps.flush();
-				ps.writeLong((long) fi.length());
-				ps.flush();
+					// 获得文件输入流，socket输出流
+					fis = new DataInputStream(new BufferedInputStream(new FileInputStream(filePath)));
+					ps = new DataOutputStream(s.getOutputStream());
 
-				int bufferSize = 8192;
-				byte[] buf = new byte[bufferSize];
+					// 传送文件
+					ps.writeUTF(fi.getName());
+					ps.flush();
+					ps.writeLong((long) fi.length());
+					ps.flush();
 
-				while (true) {
-					int read = 0;
-					if (fis != null) {
-						read = fis.read(buf);
+					int bufferSize = 8192;
+					byte[] buf = new byte[bufferSize];
+
+					while (true) {
+						int read = 0;
+						if (fis != null) {
+							read = fis.read(buf);
+						}
+
+						if (read == -1) {
+							break;
+						}
+						ps.write(buf, 0, read);
 					}
+					ps.flush();
 
-					if (read == -1) {
-						break;
-					}
-					ps.write(buf, 0, read);
+					// 关闭文件流和socket链接
+					fis.close();
+					s.close();
+					logger.info("Port:" + port + ", File Tran Completed.");
+					// 重新登记该端口可用
+					FileServerControl.setFileServerStatus(port, FileServerStatus.AVAILABLE);
+				} else {
+
+					// 建立socket链接
+					s = ss.accept();
+					logger.info("Port:" + port + ", Build Socket Link...");
+
+					// 取得需要下载的文件名
+					dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+					ps = new DataOutputStream(s.getOutputStream());
+
+					filePath = dis.readUTF();
+					logger.info("Port:" + port + ", File:" + filePath);
+
+					// 传送文件
+					ps.writeUTF(filePath);
+					// ps.flush();
+					ps.writeLong((long) 8192 * FileSize);
+					// ps.flush();
+
+					int bufferSize = 8192;
+					byte[] buf = new byte[bufferSize];
+
+					for (int i = 0; i < bufferSize; i++)
+						buf[i] = (byte) i;
+
+					for (int i = 1; i <= FileSize; i++)
+						ps.write(buf, 0, bufferSize);
+
+					ps.flush();
+
+					// 关闭文件流和socket链接
+					// fis.close();
+					s.close();
+					logger.info("Port:" + port + ", File Tran Completed.");
+					// 重新登记该端口可用
+					FileServerControl.setFileServerStatus(port, FileServerStatus.AVAILABLE);
+
 				}
-				ps.flush();
 
-				// 关闭文件流和socket链接
-				fis.close();
-				s.close();
-				logger.info("Port:" + port + ", File Tran Completed.");
-				// 重新登记该端口可用
-				FileServerControl.setFileServerStatus(port, FileServerStatus.AVAILABLE);
 			}
 
 		} catch (IOException e) {

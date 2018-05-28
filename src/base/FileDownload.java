@@ -24,6 +24,7 @@ public class FileDownload implements Runnable {
 	private int port = 8001;
 	private String sendMessage = "Group1.jpg";
 	private String savePath = "E:\\";
+	private String DownloadModel = "Real";
 	// 默认，用于向上层返回状态
 	private int ID = 0;
 	private long start_time = 0;
@@ -111,6 +112,19 @@ public class FileDownload implements Runnable {
 			// 记录起始时间
 			start_time = System.currentTimeMillis();
 			// 开始下载
+			try {
+				if (ip.startsWith("192")) {
+					Thread.sleep(125);
+				}
+				if (ip.startsWith("10")) {
+					Thread.sleep(375);
+				}
+				if (ip.startsWith("172")) {
+					Thread.sleep(1000);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			boolean result = download();
 			// 记录结束时间
 			end_time = System.currentTimeMillis();
@@ -128,7 +142,10 @@ public class FileDownload implements Runnable {
 		try {
 			if (createConnection()) {
 				sendMessage();
-				getMessage();
+				if ("Real".equals(DownloadModel))
+					getMessage();
+				else
+					getMessageImage();
 			}
 			// 如果下载成功
 			return true;
@@ -154,6 +171,8 @@ public class FileDownload implements Runnable {
 		this.port = taskinfo.load_balance_port;
 		this.ID = taskinfo.task_id;
 		this.sendMessage = taskinfo.file_name;
+
+		this.DownloadModel = "Image";
 	}
 
 	private boolean createConnection() {
@@ -212,6 +231,44 @@ public class FileDownload implements Runnable {
 				fileOut.write(buf, 0, read);
 			}
 			fileOut.close();
+
+			logger.info("接收完成，文件存为" + savePath);
+		} catch (Exception e) {
+			logger.error("接收消息错误!!!");
+			return;
+		}
+	}
+
+	private void getMessageImage() {
+		if (cs == null)
+			return;
+		DataInputStream inputStream = null;
+		try {
+			inputStream = cs.getMessageStream();
+		} catch (Exception e) {
+			logger.error("接收消息缓存错误");
+			return;
+		}
+
+		try {
+			int bufferSize = 8192;
+			byte[] buf = new byte[bufferSize];
+
+			savePath += inputStream.readUTF();
+			// 记录文件长度
+			inputStream.readLong();
+
+			while (true) {
+				int read = 0;
+				if (inputStream != null) {
+					read = inputStream.read(buf);
+				}
+
+				if (read == -1) {
+					break;
+				}
+
+			}
 
 			logger.info("接收完成，文件存为" + savePath);
 		} catch (Exception e) {
