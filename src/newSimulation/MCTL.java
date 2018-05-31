@@ -1,10 +1,12 @@
 package newSimulation;
 
 import java.util.*;
+import java.util.Map.Entry;
 
-public class MixCoWCTL {
+public class MCTL {
 	public static HashMap<String, HashSet<String>> Map = new HashMap<>();
-
+	public static HashMap<String, Double> Pressure = new HashMap<>();
+	
 	public static void MainFunction() {
 		int first_a = 0, first_b = 0, first_c = 0;
 		double pre = Double.MAX_VALUE;
@@ -26,7 +28,7 @@ public class MixCoWCTL {
 			if (evalution.firstEntry().getValue().equals("case1")) {
 				System.out.println("CASE1-"+evalution.firstKey());
 				first_a++;
-				//break;
+				// break;
 			}
 
 			if (evalution.firstEntry().getValue().equals("case2")) {
@@ -50,10 +52,12 @@ public class MixCoWCTL {
 		}
 		
 		subMap(first_a, first_b, first_c);
-
+		for(int i=1;i<=3;i++){
+			System.out.println("P:"+Pressure.get("Zone"+i));
+		}
 	}
-
-
+	
+	
 	public static double subMap(int first_a, int first_b, int first_c) {
 		// 先清理Map
 		Map.clear();
@@ -77,16 +81,20 @@ public class MixCoWCTL {
 			}
 
 			Map.put("Zone" + i, localmap);
-		}
+		}// end for
 
+		// 预先计算压力
+		PreCalPressure(mark);
+		
 		// 之后放置第二部分
 		// 当还有空间的时候
-		while (hasStorageSpace()) {
+		while(hasStorageSpace()){
 			// 先找到下一个要放的内容
 			int point = GetNextGlobalPoint(mark);
 			String content_id = PublicSetting.GlobalRank.get(point);
-
+			
 			TreeMap<Double, String> candidate = new TreeMap<>(Collections.reverseOrder());
+			// 先按照权重生成候选人名单
 			for (int i = 1; i <= 3; i++) {
 				if (Map.get("Zone" + i).size() < PublicSetting.StorageSpace) {
 					double val = PublicSetting.ArrivalRate.get("Zone" + i)
@@ -95,17 +103,122 @@ public class MixCoWCTL {
 					candidate.put(val, "Zone" + i);
 				}
 			}
-
-			String target = candidate.firstEntry().getValue();
+			
+			boolean if_success = false;
+			String target = null;
+			Iterator<Entry<Double, String>> it = candidate.entrySet().iterator();
+			while(it.hasNext()){
+				target = it.next().getValue();
+				
+				//如果该目标服务器负载小于预设阈值
+				if(Double.compare(Pressure.get(target),PublicSetting.Processing*PublicSetting.rate)<0){
+					// 标记为可选项
+					if_success = true;
+					break;
+				}
+				
+				//否则继续查找下一个
+			}
+			
+			// 如果没有成功找到，即代表所有服务器都超过了负载
+			if(!if_success){
+				candidate.clear();
+				
+				for(int i=1;i<=3;i++){
+					if(Map.get("Zone" + i).size() < PublicSetting.StorageSpace)
+						candidate.put(Pressure.get("Zone"+i),"Zone"+i);						
+				}
+				
+				// 则选择负载最低的一个作为目标 （注意此处为倒叙）
+				target = candidate.lastEntry().getValue();
+			}
+			
+			
+			// 存入该内容，更新mark，更新Pressure
 			Map.get(target).add(content_id);
-
-			// 更新mark
+			
 			mark.add(content_id);
+			
+			for(int i=1;i<=3;i++){
+				if(Map.get("Zone"+i).contains(content_id)){
+					double pre = Pressure.get("Zone"+i);
+					pre = pre + PublicSetting.ArrivalRate.get("Zone"+i)
+								*PublicSetting.Popularity.get("Zone"+i).get(content_id)
+								*PublicSetting.L1;
+					
+					Pressure.put("Zone"+i, pre);
+				}else{
+					double bal = Pressure.get(target);
+					bal = bal + PublicSetting.ArrivalRate.get("Zone"+i)
+								*PublicSetting.Popularity.get("Zone"+i).get(content_id)
+								*PublicSetting.L2;
+		
+					Pressure.put(target, bal);
+				}
+			}// end for
+			
+			
 		}
-
+		
 		// 计算可能的时延
 		return evaluateLatency(mark);
 	}
+	
+	
+	
+	/**
+	 * 压力预先计算
+	 * */
+	private static void PreCalPressure(HashSet<String> mark){
+		Pressure.clear();
+		
+		Pressure.put("Zone1", 0.0);
+		Pressure.put("Zone2", 0.0);
+		Pressure.put("Zone3", 0.0);
+		
+		// 考察每一个内容
+		for(int c=1;c<=PublicSetting.ContentNumber;c++){
+			// 只有该内容在Zone中有存储，才会产生压力
+			if(mark.contains("C"+c)){
+				
+				//考察每一个服务器
+				for(int i=1;i<=3;i++){
+					if(Map.get("Zone"+i).contains("C"+c)){
+						double pre = Pressure.get("Zone"+i);
+						pre = pre + PublicSetting.ArrivalRate.get("Zone"+i)
+									*PublicSetting.Popularity.get("Zone"+i).get("C"+c)
+									*PublicSetting.L1;
+						
+						Pressure.put("Zone"+i, pre);
+					}else{
+						//如果本地没有该内容，先计算整个区域有多少服务器有该内容
+						double number = 0;
+						for(int j=1;j<=3;j++){
+							if(Map.get("Zone"+j).contains("C"+c))
+								number = number + 1;
+						}
+						
+						//负载均衡
+						for(int j=1;j<=3;j++){
+							if(Map.get("Zone"+j).contains("C"+c)){
+								double bal = Pressure.get("Zone"+j);
+								bal = bal + PublicSetting.ArrivalRate.get("Zone"+i)
+											*PublicSetting.Popularity.get("Zone"+i).get("C"+c)
+											*PublicSetting.L2 / number;
+								
+								Pressure.put("Zone"+j, bal);
+							}
+						}
+
+					}//end if
+				}// end for server
+				
+				
+			} // end if mark
+		}// end for content
+		
+	}
+	
 
 	// 评估当前Map下的平均时延
 	private static double evaluateLatency(HashSet<String> mark) {
@@ -132,7 +245,10 @@ public class MixCoWCTL {
 
 		return result;
 	}
-
+	
+	/**
+	 * 判断是否还有可用存储空间
+	 * */
 	private static boolean hasStorageSpace() {
 		for (int i = 1; i <= 3; i++) {
 			if (Map.get("Zone" + i).size() < PublicSetting.StorageSpace)
@@ -142,6 +258,9 @@ public class MixCoWCTL {
 		return false;
 	}
 
+	/**
+	 * 根据全局喜好程度，查找下一个需要存储的内容
+	 * */
 	private static int GetNextGlobalPoint(HashSet<String> mark) {
 		int gr = 1;
 
@@ -155,7 +274,8 @@ public class MixCoWCTL {
 
 		return gr;
 	}
-
+	
+	
 	public static void main(String[] args) {
 		PublicSetting.GenerateZipf(0.88);
 		PublicSetting.PutPopularitySame();
@@ -170,4 +290,6 @@ public class MixCoWCTL {
 		MainFunction();
 		PublicSetting.ShowMap(Map);
 	}
+	
+	
 }

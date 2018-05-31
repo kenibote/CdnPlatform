@@ -19,6 +19,8 @@ public class PublicSetting {
 
 	public static int ContentNumber = 1000;
 	public static int StorageSpace = 100;
+	public static double Processing = 80.0;
+	public static double rate =0.8;
 
 	public static double L1 = 2.0;
 	public static double L2 = 7.5;
@@ -161,6 +163,7 @@ public class PublicSetting {
 			number_rank.add(wval);
 		}
 
+		GlobalRank.add(" ");
 		for (double e : number_rank) {
 			for (int c = 1; c <= ContentNumber; c++) {
 				if (Double.compare(e, wP.get("C" + c)) == 0)
@@ -205,6 +208,31 @@ public class PublicSetting {
 			} // end while time
 
 		}// end for each zone
+
+	}
+	
+	
+	public static void ShowMap(HashMap<String, HashSet<String>> mMap) {
+		HashMap<String, Iterator<Integer>> show = new HashMap<>();
+
+		for (int i = 1; i <= 3; i++) {
+			HashSet<String> local_map = mMap.get("Zone" + i);
+			TreeSet<Integer> local_map_show = new TreeSet<>();
+
+			for (String e : local_map) {
+				local_map_show.add(Integer.parseInt(e.substring(1)));
+			}
+
+			show.put("Zone" + i, local_map_show.iterator());
+		}
+
+		System.out.println("-------ShowMap-------");
+		for (int c = 1; c <= StorageSpace; c++) {
+			for (int i = 1; i <= 3; i++)
+				System.out.print(show.get("Zone" + i).next() + "  ");
+
+			System.out.println("");
+		}
 
 	}
 	
