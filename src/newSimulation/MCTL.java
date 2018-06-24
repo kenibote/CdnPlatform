@@ -28,7 +28,7 @@ public class MCTL {
 			if (evalution.firstEntry().getValue().equals("case1")) {
 				System.out.println("CASE1-"+evalution.firstKey());
 				first_a++;
-				// break;
+				//break;
 			}
 
 			if (evalution.firstEntry().getValue().equals("case2")) {

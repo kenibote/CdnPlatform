@@ -1,5 +1,7 @@
 package newSimulation;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 import simulation.SimulationTask;
@@ -19,16 +21,16 @@ public class PublicSetting {
 
 	public static int ContentNumber = 1000;
 	public static int StorageSpace = 100;
-	public static double Processing = 80.0;
+	public static double Processing = 10.0;
 	public static double rate =0.8;
 
-	public static double L1 = 2.0;
-	public static double L2 = 7.5;
-	public static double L3 = 17.5;
+	public static double L1 = 0.29;  //0.4
+	public static double L2 = 0.36; //0.46
+	public static double L3 = 0.6; //0.78
 
 	static {
-		ArrivalRate.put("Zone1", 40.0);
-		ArrivalRate.put("Zone2", 20.0);
+		ArrivalRate.put("Zone1", 45.0);
+		ArrivalRate.put("Zone2", 15.0);
 		ArrivalRate.put("Zone3", 10.0);
 	}
 
@@ -234,6 +236,27 @@ public class PublicSetting {
 			System.out.println("");
 		}
 
+	}
+	
+	
+	public static void WriteMap(HashMap<String, HashSet<String>> mMap,String Path) throws Exception {
+		FileWriter fout = new FileWriter(Path);
+
+		for (int i = 1; i <= 3; i++) {
+			HashSet<String> zone = mMap.get("Zone" + i);
+
+			fout.write("LocalServer" + i + ":");
+
+			Iterator<String> it = zone.iterator();
+			fout.write(it.next());
+			while (it.hasNext()) {
+				fout.write("-" + it.next());
+			}
+
+			fout.write("\r\n");
+		}
+
+		fout.close();
 	}
 	
 	

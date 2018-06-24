@@ -21,12 +21,4 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 src/test/
-ampl/40_10_10_c100x8.txt
-ampl/40_10_10_c60x8.txt
-ampl/40_10_10_c80x8.txt
-ampl/40_20_10_c100.txt
-ampl/baseline.txt
-ampl/compZone23.txt
-ampl/compZone3.txt
-ampl/新建文本文档.txt
-ampl/40_20_10_c80.txt
+ampl/
